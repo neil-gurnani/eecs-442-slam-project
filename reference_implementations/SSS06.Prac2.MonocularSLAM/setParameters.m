@@ -13,7 +13,7 @@ warning('off');
 
 % Sequence path and initial image
 handles.sequencePath = 'juslibol/seqtest';
-handles.initialImage = 30;
+handles.initialImage = 2;
 handles.numberOfImages = 180;
 
 % General
