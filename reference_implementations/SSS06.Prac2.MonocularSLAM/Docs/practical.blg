@@ -1,0 +1,9 @@
+This is BibTeX, Version 0.99cThe top-level auxiliary file: practical.aux
+The style file: plain.bst
+Illegal, another \bibstyle command---line 13 of file practical.aux
+ : \bibstyle
+ :          {ieee}
+I'm skipping whatever remains of this command
+Database file #1: IEEEabrv.bib
+Database file #2: practical.bib
+(There was 1 error message)

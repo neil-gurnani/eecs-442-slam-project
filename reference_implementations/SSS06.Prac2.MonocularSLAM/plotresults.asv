@@ -1,0 +1,73 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLAM Summer School 2006, Oxford.
+% Practical 3. SLAM using Monocular Vision.
+% Practical exercise.
+% J.M.M. Montiel, Javier Civera, Andrew J. Davison.
+% {josemari, jcivera}@unizar.es, ajd@doc.ic.ac.uk
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function plotresults( step, figure_all, figure_image, figure_3D,...
+        x_k_k, p_k_k, h_all, S, z_all, featuresInfo, cam, im,...
+        camHistory, randSphere6D, nPointsRand, axisLimits, chi2inv_table )
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot features in image and 3D world
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+figure( figure_all );
+subplot(figure_image);
+hold off;
+imagesc(im);
+colormap gray;
+hold on;
+
+subplot( figure_3D );
+view_k_1=view;
+hold off;
+plotUncertainEllip3D( p_k_k( 1:3, 1:3 ), x_k_k( 1:3 ), chi2inv_table( 2, 3 ), 'b', 0 );
+hold on;
+
+for i=1:size(featuresInfo,2)
+    if size(h_all,1)>0
+        if h_all(featuresInfo(i).positionInStateVector,:) ~= [-1 -1]
+            subplot(figure_image);
+            if z_all(featuresInfo(i).positionInStateVector,:) ~= [-1 -1]
+                plot( h_all(featuresInfo(i).positionInStateVector,1),...
+                    h_all(featuresInfo(i).positionInStateVector,2), 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor', 'r', 'MarkerSize', 3 );
+                plotUncertainEllip2D( S(1:2,1:2), h_all(featuresInfo(i).positionInStateVector,:), chi2inv_table(1,3), 'r' );
+            else
+                plot( h_all(featuresInfo(i).positionInStateVector,1),...
+                    h_all(featuresInfo(i).positionInStateVector,2), 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor', 'c', 'MarkerSize', 3 );
+                plotUncertainEllip2D( S(1:2,1:2), h_all(featuresInfo(i).positionInStateVector,:), chi2inv_table(1,3), 'c' );    
+            end
+            text( h_all(featuresInfo(i).positionInStateVector,1)+8,...
+                h_all(featuresInfo(i).positionInStateVector,2), sprintf( '%d', i ), 'color', [0 0 0], 'FontSize', 14);
+            S = S(3:end,3:end);
+        end
+        if z_all(featuresInfo(i).positionInStateVector,:) ~= [-1 -1]
+            subplot(figure_image);
+            plot( z_all(featuresInfo(i).positionInStateVector,1),...
+                z_all(featuresInfo(i).positionInStateVector,2), 'g+' );
+        end
+    end
+    subplot( figure_3D );
+    xyztpl = x_k_k(13+1+6*(featuresInfo(i).positionInStateVector-1):13+6*(featuresInfo(i).positionInStateVector));
+    p_xyztpl = p_k_k(13+1+6*(featuresInfo(i).positionInStateVector-1):13+6*(featuresInfo(i).positionInStateVector),...
+        13+1+6*(featuresInfo(i).positionInStateVector-1):13+6*(featuresInfo(i).positionInStateVector));
+    [ xyz ] = XYZTPL2XYZ( xyztpl );
+    if i==5
+        plot3( xyz(1), xyz(2), xyz(3), 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor', [128], 'MarkerSize', 3 );
+        plotUncertainSurfaceXZ( p_xyztpl, xyztpl, chi2inv_table(2,3), [0 0 1], randSphere6D, nPointsRand );
+    elseif i==15
+        plot3( xyz(1), xyz(2), xyz(3), 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor', 'g', 'MarkerSize', 3 );
+        plotUncertainSurfaceXZ( p_xyztpl, xyztpl, chi2inv_table(2,3), [0 1 0], randSphere6D, nPointsRand );
+    else 
+        plot3( xyz(1), xyz(2), xyz(3), 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor', 'r', 'MarkerSize', 3 );
+        plotUncertainSurfaceXZ( p_xyztpl, xyztpl, chi2inv_table(2,3), [1 0 0], randSphere6D, nPointsRand );
+    end
+    text( xyz(1), xyz(2), xyz(3), sprintf( '%d', i ), 'color', [0 0 0], 'FontSize', 13);
+end
+
+plot3(camHistory(1,1:step),camHistory(2,1:step),camHistory(3,1:step), 'LineWidth', 1.5);
+view(view_k_1);
+axis(axisLimits);

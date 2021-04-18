@@ -1,0 +1,313 @@
+\newcommand{\bmath}[1]{\mbox{$\mathbf{#1}$}}
+\newcommand{\q}{\bmath{q}}
+\newcommand{\y}{\bmath{y}}
+\newcommand{\x}{\bmath{x}}
+\newcommand{\de}{\bmath{d}}
+\newcommand{\ere}{\bmath{r}}
+\newcommand{\omegav}{\bmath{\omega}}
+\newcommand{\f}{\bmath{f}}
+\newcommand{\n}{\bmath{n}}
+\newcommand{\Pe}{\bmath{P}}
+\newcommand{\F}{\bmath{F}}
+\newcommand{\G}{\bmath{G}}
+\newcommand{\I}{\bmath{I}}
+\newcommand{\J}{\bmath{J}}
+\newcommand{\K}{\bmath{K}}
+\newcommand{\Ese}{\bmath{S}}
+\newcommand{\R}{\bmath{R}}
+\newcommand{\Ha}{\bmath{H}}
+\newcommand{\h}{\bmath{h}}
+\newcommand{\m}{\bmath{m}}
+\newcommand{\z}{\bmath{z}}
+\newcommand{\uve}{\bmath{v}}
+\newcommand{\V}{\bmath{V}}
+\newcommand{\undist}{\bmath{uds}}
+\newcommand{\dist}{\bmath{ds}}
+\newcommand{\amin}{\bmath{a}}
+
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{times,epsfig}
+
+
+\setlength{\oddsidemargin}{-7mm}
+\setlength{\evensidemargin}{-7mm}
+\setlength{\topmargin}{-14mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{1mm}
+\setlength{\textwidth}{173mm}
+\setlength{\textheight}{244mm}
+\setlength{\unitlength}{1mm}
+
+%\input newcom.tex
+%\input symbols.tex
+
+
+\newcommand{\coursetitle}{SLAM Summer School 2006}
+\newcommand{\tutorialtitle}{Practical 3: SLAM using Monocular Vision}
+\newcommand{\docauthor}{Javier Civera, University of Zaragoza\\
+                        Andrew J. Davison, Imperial College London\\
+                        J.M.M Montiel, University of Zaragoza.}
+\newcommand{\docemails}{josemari@unizar.es, jcivera@unizar.es, ajd@doc.ic.ac.uk}
+
+
+\begin{document}
+
+
+\bibliographystyle{plain}
+
+
+\begin{center}
+
+\hrule
+\vspace{2mm}
+{\LARGE\bf \coursetitle}
+
+\vspace{2mm}
+{\Large\bf \tutorialtitle}
+
+\vspace{2mm}
+{\large \docauthor}
+\\
+{\large \texttt{\docemails}}
+
+
+\end{center}
+
+
+\hrule
+
+%\hrule
+\vspace{5mm}
+
+
+
+%\vspace{10mm}
+%\hrule
+%\vspace{2mm}
+
+\setcounter{page}{1}
+\setcounter{section}{0}
+
+
+
+\section{Objectives}
+\begin{enumerate}
+\item Understanding the characteristics of SLAM using a monocular
+camera as a sensor.
+\begin{enumerate}
+\item Map management.
+\item Feature initialization.
+\item Near and far features.
+\end{enumerate}
+\item Understanding the inverse depth parametrization of the map
+features in monocular SLAM.
+\item Understanding the performance
+limits of the constant velocity motion model for the camera as the
+unique SLAM sensor without odometry.
+\end{enumerate}
+
+
+\section{Exercise 1. Feature selection and matching.}
+One of the particular characteristics of the monocular SLAM
+current computers cannot process all the information provided by
+image sensors. So, heuristics to select which features are
+included in the map are used. The desirable properties of the map
+features are:
+\begin{enumerate}
+\item Saliency, features have to be identified by a texture patch.
+\item About 14 map features have to be visible in the image, if not
+new map features are initialized.
+\item Spread over the whole image.
+\end{enumerate}
+
+The goal for this exercise is to do manually the feature
+initialization in order to meet the previous criteria. Run
+\texttt{mono\_slam.m}. With the user interface, you can add
+features and perform step by step the EKF SLAM:
+\begin{enumerate}
+\item In the first image add about ten salient features spread over the image.
+You can watch the movie \texttt{juslibol\_SLAM.mpg} with the
+software mpeg\_play as an example on which features select (but you
+can of course select other ones). This movie shows the results when
+applying automatic feature selection.
+\item As camera moves, some features will not be seen, and you will
+have to add new ones in order to have around 14 map features
+visible.
+\end{enumerate}
+
+\section{Exercise 2. Near features and far features.}
+A camera is a bearing-only sensor. This means that the depth of a
+feature cannot be estimated with a single image measurement. The
+depth of the feature can be estimated only if the feature is
+observed from different points of view (only if the camera
+translates enough to produce a significant parallax). So, it can
+be distant features whose depth cannot be correctly estimated for
+a long time, or even never if the translation is never big enough
+to produce parallax.
+
+The goal of this exercise is to observe the different estimation
+evolution for near and distant features and their influence in the
+camera location estimate.
+
+\begin{enumerate}
+\item Open the video \texttt{parallax.mpg}.
+      Observe the different motion \emph{in the image} of different depth features.
+      Open the video \texttt{noparallax.mpg} and see now that the motion in the image
+       of different depth features is the same.
+\item Now analyse the video we are using for this practical (\texttt{juslibol.mpg}).
+Distinguish in this video parts with \emph{low parallax motion}.
+\item Run \texttt{mono\_slam.m}.
+\begin{itemize}
+\item  Observe what happens to the features in the 3D map
+(initialization value and covariance and value and covariance
+after some frames). Red dots are the estimated values and red
+lines limit the $95\%$ acceptance region.
+\item The code singles out features \#5 and \#15 and displays depth
+estimation and its $95\%$ acceptance region: [lower limit,
+estimation, upper limit]. When clicking, make sure that feature \#5
+corresponds to a near one (for example, on the car) and feature \#15
+corresponds to a far one (for example, the tree appearing on the
+left).
+\item   Notice the difference between the evolution of near and
+distant features.
+\item Observe the camera location uncertainty
+evolution (Use the axes limit controls in the user interface).
+\item Observe what happen to features and camera location uncertainties
+during the low parallax motion part discussed in point 2. Notice
+the difference between this part of the 3D map (constructed with
+low parallax information) and the high parallax parts.
+\end{itemize}
+\end{enumerate}
+
+
+
+
+\section{Exercise 3. Inverse depth parameterization.}
+
+Initializing a feature in monocular SLAM is a challenging issue,
+because the depth uncertainty is not well modelled by a Gaussian.
+This problem is overcome using inverse depth instead of the
+classical $XYZ$ representation.
+\begin{figure}
+\centering
+\includegraphics[width=0.5\columnwidth]{FeatureObservationAndParameterization.eps}
+\caption{Feature parameterization and measurement equation.}
+\label{fig_feat_par}
+\end{figure}
+
+Matlab code of the practical is coded in inverse depth so state
+vector is:
+\begin{equation}
+\x=\left(\x_v^\top, \y_1^\top, \y_2^\top, \ldots
+\y_n^\top\right)^\top.
+\end{equation}
+it is composed of:
+\begin{enumerate}
+\item 13 components that correspond to the location and velocity of
+the camera:
+\begin{equation}
+\x_v=\left(\begin{array}{c}\ere^{WC}\\\q^{WC}\\\uve^{W}\\\omegav^{W}\end{array}\right).
+\end{equation}
+
+\item The rest of the components are features. Each feature is represented by 6 parameters,
+ that are the position of the camera the first time the feature was
+ seen $x_i,  y_i,  z_i$, the ray coded with azimuth-elevation angles ($\theta,\phi$), in absolute reference,
+ and the inverse depth, $\rho$, of the feature along the ray:
+\begin{equation}
+\y_i=\left(\begin{array}{cccccc}x_i & y_i & z_i & \theta_i &
+\phi_i & \rho_i\end{array}\right)^\top
+\end{equation}
+So the transformation from the inverse depth coding to the
+Eucleidean coding in the absolute frame is:
+\begin{equation}
+\left(\begin{array}{c}x\\y\\z\end{array}\right)=\left(\begin{array}{c}x_i\\y_i\\z_i\end{array}\right)+
+                    \frac{1}{\rho_i}\m\left(\theta_i,
+                    \phi_i\right).
+\end{equation}
+where:
+\begin{equation}
+\m=\left(\begin{array}{ccc}\cos\phi_i \sin\theta_i&
+                     -\sin\phi_i&
+                     \cos\phi_i \cos\theta_i\end{array}\right)^\top
+                     \label{eq-m}
+\end{equation}
+
+\end{enumerate}
+The goal of this exercise is to understand the inverse depth
+parameterisation.
+\begin{enumerate}
+\item The code stores partial information about features \#5 and
+\#15 in the file \texttt{history.mat}:
+
+\begin{itemize}
+\item \texttt{feature5History} is a 6 row matrix, Each column containing the feature \#5
+location coded in inverse depth at step $k$.
+\item \texttt{rhoHistory\_5} is a row vector containing the inverse depth estimation
+history for feature 5.
+\item \texttt{rhoHistory\_15} is a row vector containing the inverse depth estimation
+history for feature 15.
+\item \texttt{rhoStdHistory\_5} is a row vector containing the inverse depth
+standard deviation history for feature 5.
+\item \texttt{rhoStdHistory\_15} is a row vector containing the inverse depth standard deviation
+history for feature 15.
+\end{itemize}
+
+\item Compute the $XYZ$ Euclidean location for feature \#5 after
+processing all images.
+
+\item Do a graph with the value of the inverse depth and the
+  $95\%$ acceptance region history for both features \#5 and \#15.
+  Use the matlab functions \texttt{open}, \texttt{figure}, \texttt{hold}, and \texttt{plot}.
+  Comment the difference between the two graphs.
+
+\item After processing the whole sequence, what is the estimation and the
+acceptance region \emph{expressed in depth} for both features?
+
+Think about a feature at infinity, what inverse depth would have?
+
+Try to see in the previous graphs when the infinity is included in
+both features estimation, that is, the feature can be at any depth
+in the ray.
+\end{enumerate}
+
+\section{Exercise 4. Constant velocity motion model (optional)}
+Monocular SLAM uses camera as the unique sensor, without any
+odometry input. It is used a constant velocity model so the
+systems needs as input both the camera frame rate and the maximum
+expected angular and linear acceleration.
+
+For a given camera acceleration, the frame rate defines the
+acceptance region for the point matching, so for any acceleration,
+the acceptance regions can be kept low if a frame rate high enough
+is used.
+
+The goal of this exercise is to analyse the effect of the linear
+acceleration, the angular acceleration and the frame rate.
+
+\begin{enumerate}
+\item The initial tuning is $6\frac{m}{s^2}$ and $6\frac{\mbox{rad}}{s^2}$.
+\item Increase the angular acceleration only (for instance, double
+the value) and analyse the effect on the search region. Find this
+parameter in the file \texttt{mono\_slam.m}, its name is
+\texttt{sigma\_alphaNoise}.
+
+\item Increase the linear acceleration only (for instance, double
+the value), analyse the effect and compare with the previous
+point. The name of this parameter is \texttt{sigma\_aNoise}.
+
+\item Reduce the frame rate processing and see the effect:
+\begin{enumerate}
+\item 1 out of 2 images.
+\item 1 out of 4 images.
+\end{enumerate}
+Clue: Find the variable step and the code associated with this
+variable. You will also have to modify the variable
+\texttt{deltat}, that codes the time between frames.
+
+\end{enumerate}
+
+\nocite{Hartley2004,Davison2003,Montiel2006RSS,Bar-Shalom-88}
+\bibliographystyle{ieee}
+\bibliography{IEEEabrv,practical}
+\end{document}

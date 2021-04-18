@@ -1,0 +1,24 @@
+\begin{thebibliography}{1}
+
+\bibitem{Bar-Shalom-88}
+Y.~Bar-Shalom and T.~E. Fortmann.
+\newblock {\em Tracking and Data Association}, volume 179 of {\em Mathematics
+  in Science and Engineering}.
+\newblock Academic Press, INC., San Diego, 1988.
+
+\bibitem{Davison2003}
+A.~Davison.
+\newblock Real-time simultaneous localization and mapping with a single camera.
+\newblock In {\em Proc. International Conference on Computer Vision}, 2003.
+
+\bibitem{Hartley2004}
+R.~I. Hartley and A.~Zisserman.
+\newblock {\em Multiple View Geometry in Computer Vision}.
+\newblock Cambridge University Press, ISBN: 0521540518, second edition, 2004.
+
+\bibitem{Montiel2006RSS}
+J.M.M Montiel, Javier Civera, and Andrew~J. Davison.
+\newblock Unified inverse depth parametrization for monocular slam.
+\newblock In {\em Robotics Science and Systems}, 2006.
+
+\end{thebibliography}
