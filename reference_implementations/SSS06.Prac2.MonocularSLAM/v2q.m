@@ -15,5 +15,6 @@ else
     disp(v);
     disp(theta);
     v_n=v/norm(v);
-    q=quaternion(v_n,theta);
+    %q=quaternion(v_n,theta);
+    q=quaternion(v_n'*theta, 'rotvec')
 end
