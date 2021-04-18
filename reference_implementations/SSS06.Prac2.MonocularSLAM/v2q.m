@@ -16,5 +16,6 @@ else
     disp(theta);
     v_n=v/norm(v);
     %q=quaternion(v_n,theta);
-    q=compact(quaternion(v_n'*theta, 'rotvec'))
+    q=compact(quaternion(v_n'*theta, 'rotvec'));
+    %q=[v(1)*sin(theta/2) v(2)*sin(theta/2) v(3)*sin(theta/2) cos(theta/2)]
 end
