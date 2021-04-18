@@ -1,0 +1,44 @@
+Reference: https://github.com/felixchenfy/Monocular-Visual-Odometry
+
+INTIALIZATION
+	Set frame 1 to be the world frame
+	Compute pose of frame 2
+		Feature extraction
+		Feature matching
+		Compute homography matrix with RANSAC
+			Optional extenstion:
+				Compute essential matrix
+				Compute symmetric transfer error to decide which to use
+		Decompose homography into relative pose (rotation and translation)
+	Remove incorrectly matched points
+	Get 3d positions of inlier points with triangulation
+	Remove points with insufficient parallax
+		If not enough points left, or if median triangulation angle is too small, discard the frame and return to previous step
+		(Repeat until we have a good frame)
+	Add remaining points to the local map
+	Use ground truth translation to appropriately scale the depth (there is no global scale)
+
+TRACKING
+	Find visible map points (assume the pose is the same as the previous frame)
+	Match the visible map points to observed keypoints in the current frame
+	Estimate camera pose via perspecive-n-points (PnP) from OpenCV
+
+LOCAL MAP (OPTIONAL)
+	Determine if current frame is a keyframe (if translation and rotation from previous keyframe is large enough)
+	If keyframe:
+		Match keypoints with previous keyframe
+		Get inliers via epipolar constraint (?)
+		For each inlier that hasn't been triangulated, triangulate and push to the local map
+	Remove obsolete map points
+		Not in current view
+		View angle larger than threshold (?)
+		Can't be matched as an inlier (?)
+	All the while, build a graph
+		Connect each inlier to its matched point in the local map and/or previous keyframe
+
+OPTIMIZATION (OPTIONAL -- requires LOCAL MAP)
+	Optimization is over the previous N frames
+	Find all corresponding 3D-2D pairs
+	Project 3D to 2D
+	Compute distance error in 2D and sum over all pairs of points
+	*optimization* over camera pose
