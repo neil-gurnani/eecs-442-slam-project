@@ -1,4 +1,4 @@
-function q=quaternion(v,theta)
+function q=my_quaternion(v,theta)
 % Iquaternion(v,theta) creates a quaternion
 % input data
 %     v the directional vector, not neccesarily unit vector
