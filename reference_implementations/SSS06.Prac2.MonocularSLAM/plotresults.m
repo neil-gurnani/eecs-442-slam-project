@@ -69,6 +69,6 @@ for i=1:size(featuresInfo,2)
 end
 
 plot3(camHistory(1,1:step),camHistory(2,1:step),camHistory(3,1:step), 'LineWidth', 1.5);
-disp(view_k_1);
-view(view_k_1);
+view_vec = view_k_1*[1; 0; 0; 1]
+view(view_vec(1:3));
 axis(axisLimits);
