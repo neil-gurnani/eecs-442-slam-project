@@ -39,7 +39,7 @@ def make_translation_matrix(vec):
 	return mat
 
 def local_xyz_to_uv(intrinsic_mat, xyz):
-	# Projects 3d points from the camera frame into the image plane, via the
+	# Projects 3d points from the camera frame onto the image plane, via the
 	# pinhole camera model.
 	# Intrinsic_mat should be the 3x4 camera intrinsic matrix
 	# xyz should be a 4x1 set of homogeneous vectors
@@ -67,3 +67,12 @@ def local_xyz_to_global_xyz(camera_pose, xyz):
 	trans_mat = make_translation_matrix(-1 * camera_pose.pos)
 	full_mat = np.matmul(rot_mat, trans_mat)
 	return np.matmul(full_mat, xyz)
+
+def global_xyz_to_uv(camera_pose, intrinsic_mat, xyz):
+	# Transforms 3d points from the world frame to the camera frame, and then projects onto the image plane.
+	# Intrinsic_mat shoul dbe the 3x4 camera intrinsic matrix
+	# Camera poses are given as transformations from local to global frame
+	# See: https://www.eth3d.net/slam_documentation
+	# xyz should be a 4x1 set of homogeneous vectors in the world frame
+	# Will return a 3x1 set of homogeneous 2D vectors (in the image plane)
+	return local_xyz_to_uv(intrinsic_mat, global_xyz_to_local_xyz(camera_pose, xyz))
