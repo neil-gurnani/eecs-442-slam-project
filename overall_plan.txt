@@ -46,7 +46,7 @@ OPTIMIZATION (OPTIONAL -- requires LOCAL MAP)
 Coding details
 
 Files
-	dataloader.py
+	dataloader.py (will have to match ground truth timestamps with image timestamps)
 	webcam_reader.py
 	display.py
 	download_dataset.py (https://www.eth3d.net/slam_datasets)
