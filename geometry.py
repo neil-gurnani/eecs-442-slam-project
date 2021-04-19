@@ -22,8 +22,16 @@ def homogenize_matrix(mat):
 	new_mat[3,3] = 1
 	return new_mat
 
-def homogenize_vector(vec):
-	# Converts a 3x1 vector to a 4x1 homogeneous vector
-	new_vec = np.ones((4,1))
-	new_vec[0:3,0] = vec
-	return new_vec
+def homogenize_vectors(vecs):
+	# Converts a 3xn set of vectors to a 4xn set of homogeneous vectors
+	return np.pad(vecs, pad_width=((0,1),(0,0)), mode="constant", constant_values=1)
+
+def unhomogenize_vectors(vecs):
+	# Converts a 4xn set of homogeneous vectors to a 3xn set of vectors
+	return vecs[0:3,:]
+
+def make_translation_matrix(vec):
+	# Converts a 3x1 vector or 4x1 homogeneous vector to a 4x4 homogeneous translation matrix
+	mat = np.eye(4)
+	mat[0:3,3] = vec
+	return mat
