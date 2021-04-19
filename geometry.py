@@ -3,7 +3,10 @@ import scipy, scipy.spatial
 
 class Pose():
 	def __init__(self, pos, quat, t=None):
-		self.pos = np.array(pos) # Should be a row vector
+		pos = np.array(pos).reshape(-1,1)
+		if len(pos) == 3:
+			pos = homogenize_vectors(pos)
+		self.pos = pos # Should be a homogeneous 4x1 column vector
 		self.quat = np.array(quat) / np.linalg.norm(quat) # Normalize to a unit quaternion.
 		                                        # Format is [x,y,z,w] for the quaternion xi+yj+zk+w.
 		                                        # This "scalar-last" convention is used by scipy.
@@ -35,7 +38,7 @@ def unhomogenize_vectors(vecs):
 def make_translation_matrix(vec):
 	# Converts a 3x1 vector or 4x1 homogeneous vector to a 4x4 homogeneous translation matrix
 	mat = np.eye(4)
-	mat[0:3,3] = vec
+	mat[0:3,3] = vec[0:3,0]
 	return mat
 
 def local_xyz_to_uv(intrinsic_mat, xyz):
