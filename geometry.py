@@ -10,9 +10,11 @@ class Pose():
 		self.t = t # Timestamp is optional
 
 def quat_to_mat(quat):
+	# Converts a quaternion w+xi+yj+zk stored as [x,y,z,w] to a 3x3 rotation matrix
 	return scipy.spatial.transform.Rotation.from_quat(quat).as_matrix()
 
 def mat_to_quat(mat):
+	# Converts a 3x3 rotation matrix to a quaternion w+xi+yj+zk stored as [x,y,z,w]
 	return scipy.spatial.transform.Rotation.from_matrix(mat).as_quat()
 
 def homogenize_matrix(mat):
@@ -35,3 +37,33 @@ def make_translation_matrix(vec):
 	mat = np.eye(4)
 	mat[0:3,3] = vec
 	return mat
+
+def local_xyz_to_uv(intrinsic_mat, xyz):
+	# Projects 3d points from the camera frame into the image plane, via the
+	# pinhole camera model.
+	# Intrinsic_mat should be the 3x4 camera intrinsic matrix
+	# xyz should be a 4x1 set of homogeneous vectors
+	# Will return a 3x1 set of homogeneous 2D vectors (in the image plane)
+	return np.matmul(intrinsic_mat, xyz)
+
+def global_xyz_to_local_xyz(camera_pose, xyz):
+	# Transforms 3d points from the world frame to the camera frame
+	# Camera poses are given as transformations from local to global frame
+	# See: https://www.eth3d.net/slam_documentation
+	# xyz should be a 4x1 set of homogeneous vectors in the world frame
+	# Will return a 4x1 set of homogeneous vectors in the camera frame
+	rot_mat = homogenize_matrix(quat_to_mat(camera_pose.quat))
+	trans_mat = make_translation_matrix(camera_pose.pos)
+	full_mat = np.matmul(trans_mat, rot_mat) # Rotate, then translate
+	return np.matmul(full_mat, xyz)
+
+def local_xyz_to_global_xyz(camera_pose, xyz):
+	# Transforms 3d points from the camera frame to the world frame
+	# Camera poses are given as transformations from local to global frame
+	# See: https://www.eth3d.net/slam_documentation
+	# xyz should be a 4x1 set of homogeneous vectors in the camera frame
+	# Will return a 4x1 set of homogeneous vectors in the world frame
+	rot_mat = homogenize_matrix(quat_to_mat(camera_pose.quat)).T
+	trans_mat = make_translation_matrix(-1 * camera_pose.pos)
+	full_mat = np.matmul(rot_mat, trans_mat)
+	return np.matmul(full_mat, xyz)
