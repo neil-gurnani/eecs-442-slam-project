@@ -64,6 +64,8 @@ Functions
 	Display
 		(IM) Single frame with keypoints
 		(IM) Two frames with matched keypoints
+		(IM) Single frame with camera position and orientation (maybe coordinate frame), and map locations in 3D
+			Bonus: interactive -- drag the image? Use matplotlib? Plotly?
 		(IM+VID) Local trajectory with local map
 		(IM+VID) Global trajectory with full map (and ground truth)
 		Interactive map viewing (OPTIONAL)
