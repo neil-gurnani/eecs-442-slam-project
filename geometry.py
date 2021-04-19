@@ -12,6 +12,12 @@ class Pose():
 		                                        # This "scalar-last" convention is used by scipy.
 		self.t = t # Timestamp is optional
 
+def identity_pose():
+	return Pose([0,0,0], identity_quat())
+
+def identity_quat():
+	return np.array([0,0,0,1])
+
 def quat_to_mat(quat):
 	# Converts a quaternion w+xi+yj+zk stored as [x,y,z,w] to a 3x3 rotation matrix
 	return scipy.spatial.transform.Rotation.from_quat(quat).as_matrix()
