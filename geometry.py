@@ -86,3 +86,21 @@ def global_xyz_to_uv(camera_pose, intrinsic_mat, xyz):
 	# xyz should be a 4x1 set of homogeneous vectors in the world frame
 	# Will return a 3x1 set of homogeneous 2D vectors (in the image plane)
 	return local_xyz_to_uv(intrinsic_mat, global_xyz_to_local_xyz(camera_pose, xyz))
+
+def only_positive_z(xyz):
+	# Returns a list of only the points in xyz with positive z values
+	# Often called before local_xyz_to_uv, to ensure we don't project points behind the camera
+	# xyz should be a 4xn set of homogeneous vectors
+	# Will return a 4x(n-k) set of homogeneous vectors
+	idx = xyz[2] > 0
+	return xyz[:,idx]
+
+def only_within_image(image_shape, uv):
+	# Returns a list of only the points in uv within the image bounds
+	# The image convenion is that (0,0) is the center of the top left pixel
+	# image_shape should be a tuple (rows, columns), i.e., (y, x)
+	# uv should be a 3x1 set of homogeneous 2D vectors
+	print(image_shape)
+	print(uv)
+	idx = np.logical_and.reduce((uv[0] >= 0, uv[0] <= image_shape[1], uv[1] >= 0, uv[1] <= image_shape[0]))
+	return uv[:,idx]
