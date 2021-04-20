@@ -8,7 +8,7 @@ from odometry_classes import MapPoint, Frame, Map
 
 global_random_feature_count = 0
 
-def create_random_fake_map_points(camera_pose, count, random_range=(1,1,1), z_min=0.1):
+def create_random_fake_map_points(camera_pose, count, random_range=(1,1,4), z_min=1):
 	# Camera poses are given as transformations from local to global frame
 	# See: https://www.eth3d.net/slam_documentation
 	# Returns random 3d points in the world frame, located in front of the given camera pose
