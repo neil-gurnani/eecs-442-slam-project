@@ -23,12 +23,12 @@ class Map():
 		self.map_points = []
 		# Need some sort of data structure holding point correspondences
 
-class Odometry():
+class SLAM():
 	def __init__(self):
 		self.local_map = Map()
 		self.global_map = Map()
-		self.has_started_initialization
-		self.has_finished_initialization
+		self.has_started_initialization = False
+		self.has_finished_initialization = False
 
 	def next_frame(self, frame):
 		if self.has_finished_initialization:
