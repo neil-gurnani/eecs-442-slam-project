@@ -25,12 +25,11 @@ class Dataloader():
 		self.f = np.array([self.fx, self.fy])
 		self.c = np.array([self.cx, self.cy])
 
-		# Create intrinsic matrix
+		# Create intrinsic matrix (stored as a 3x4 matrix)
 		self.intrinsic_mat = np.array([
-			[self.fx, 0, self.cx],
-			[0, self.fy, self.cy],
-			[0, 0, 1]])
-
+			[self.fx, 0, self.cx, 0],
+			[0, self.fy, self.cy, 0],
+			[0, 0, 1, 0]])
 
 		# Load the groundtruth timestamps
 		self.groundtruths = []
