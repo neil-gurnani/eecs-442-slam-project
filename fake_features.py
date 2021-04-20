@@ -17,7 +17,7 @@ def create_random_fake_map_points(camera_pose, count, random_range=(1,1,4), z_mi
 	lows = (-random_range[0], -random_range[1], z_min) # Can't have negative z
 	highs = (random_range[0], random_range[1], random_range[2])
 	points_local = homogenize_vectors(np.random.uniform(low=lows, high=highs, size=(count,3)).T)
-	points_global = unhomogenize_vectors(local_xyz_to_global_xyz(camera_pose, points_local))
+	points_global = local_xyz_to_global_xyz(camera_pose, points_local)
 	labels = np.arange(global_random_feature_count, global_random_feature_count + count)
 	global_random_feature_count += count
 	map_points = [MapPoint(points_global[:,i], labels[i]) for i in range(count)]
