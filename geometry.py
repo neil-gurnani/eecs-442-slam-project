@@ -53,6 +53,7 @@ def local_xyz_to_uv(intrinsic_mat, xyz):
 	# Intrinsic_mat should be the 3x4 camera intrinsic matrix
 	# xyz should be a 4x1 set of homogeneous vectors
 	# Will return a 3x1 set of homogeneous 2D vectors (in the image plane)
+	xyz[0:3] = xyz[0:3] / xyz[2]
 	return np.matmul(intrinsic_mat, xyz)
 
 def global_xyz_to_local_xyz(camera_pose, xyz):
