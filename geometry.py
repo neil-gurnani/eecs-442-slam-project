@@ -100,7 +100,5 @@ def only_within_image(image_shape, uv):
 	# The image convenion is that (0,0) is the center of the top left pixel
 	# image_shape should be a tuple (rows, columns), i.e., (y, x)
 	# uv should be a 3x1 set of homogeneous 2D vectors
-	print(image_shape)
-	print(uv)
 	idx = np.logical_and.reduce((uv[0] >= 0, uv[0] <= image_shape[1], uv[1] >= 0, uv[1] <= image_shape[0]))
 	return uv[:,idx]
