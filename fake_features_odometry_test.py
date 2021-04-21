@@ -40,6 +40,8 @@ for i in range(n_images):
 fig, (ax1, ax2) = plt.subplots(1, 2)
 ax1.imshow(frames[0].img)
 ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("Set1"))
-ax2.imshow(frames[25].img)
-ax2.scatter(frames[25].keypoints[0], frames[25].keypoints[1], c=frames[25].descriptors, cmap=plt.get_cmap("Set1"))
-plt.show()
+for i in range(n_images):
+	ax2.cla()
+	ax2.imshow(frames[i].img)
+	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("Set1"))
+	plt.pause(0.1)
