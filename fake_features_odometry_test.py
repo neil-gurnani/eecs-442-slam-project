@@ -13,7 +13,7 @@ data = Dataloader(dataset_name)
 def fake_match(desc1, desc2):
 	# Can maybe optimize this sort of function
 	# https://stackoverflow.com/questions/49247506/how-to-efficiently-find-the-indices-of-matching-elements-in-two-lists
-	return [(xi, xp) for (xi, x) in enumerate(desc1) for (xp, y) in enumerate(desc2) if x==y]
+	return np.array([(xi, xp) for (xi, x) in enumerate(desc1) for (xp, y) in enumerate(desc2) if x==y])
 
 slam = SLAM(fake_match)
 
@@ -37,11 +37,20 @@ n_images = len(data.images)
 for i in range(n_images):
 	frames.append(fake_create_input_frame(i, fake_points))
 
+# fig, (ax1, ax2) = plt.subplots(1, 2)
+# ax1.imshow(frames[0].img)
+# ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("Set1"))
+# for i in range(n_images):
+# 	ax2.cla()
+# 	ax2.imshow(frames[i].img)
+# 	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("Set1"))
+# 	plt.pause(0.1)
+
+slam.start_initialization(frames[0], data.image_groundtruths[0])
+slam.try_finish_initialization(frames[20])
 fig, (ax1, ax2) = plt.subplots(1, 2)
 ax1.imshow(frames[0].img)
 ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("Set1"))
-for i in range(n_images):
-	ax2.cla()
-	ax2.imshow(frames[i].img)
-	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("Set1"))
-	plt.pause(0.1)
+ax2.imshow(frames[20].img)
+ax2.scatter(frames[20].keypoints[0], frames[20].keypoints[1], c=frames[20].descriptors, cmap=plt.get_cmap("Set1"))
+plt.show()

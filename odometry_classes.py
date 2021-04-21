@@ -31,7 +31,7 @@ class SLAM():
 		self.global_map = Map()
 		self.has_finished_initialization = False
 		self.match_descriptors = match_descriptors_func # This function should take in two lists of descriptors,
-		                                                # and return a list of pairs of indices of matches.
+		                                                # and return a nx2 numpy array of pairs of indices of matches.
 
 	def start_initialization(self, frame, ground_truth_pose):
 		# The ground truth camera pose is only used in the first frame, so that we can work in the same
@@ -46,8 +46,9 @@ class SLAM():
 			self.start_initialization(frame)
 
 	def try_finish_initialization(self, frame):
-		start_frame_idx, next_frame_idx = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
-		start_points, next_points = self.init_frame.keypoints[start_frame_idx], frame.keypoints[next_frame_idx]
+		pairs = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
+		start_points, next_points = self.init_frame.keypoints[:,pairs[:,0]], frame.keypoints[:,pairs[:,1]]
+		start_points, next_points = start_points[:-1].T, next_points[:-1].T
 		mat, mask = cv2.findHomography(start_points, next_points, cv2.RANSAC)
 		print(mat)
 		print(mask)
