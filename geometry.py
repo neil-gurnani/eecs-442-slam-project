@@ -87,18 +87,30 @@ def global_xyz_to_uv(camera_pose, intrinsic_mat, xyz):
 	# Will return a 3x1 set of homogeneous 2D vectors (in the image plane)
 	return local_xyz_to_uv(intrinsic_mat, global_xyz_to_local_xyz(camera_pose, xyz))
 
+def only_positive_z_idx(xyz):
+	# Returns a list of the indices of only the points in xyz with positive z values
+	# Often called before local_xyz_to_uv, to ensure we don't project points behind the camera
+	# xyz should be a 4xn set of homogeneous vectors
+	# Will return a list of n-k indices, corresponding to points in xyz with positive z values
+	return xyz[2] > 0
+
 def only_positive_z(xyz):
 	# Returns a list of only the points in xyz with positive z values
 	# Often called before local_xyz_to_uv, to ensure we don't project points behind the camera
 	# xyz should be a 4xn set of homogeneous vectors
 	# Will return a 4x(n-k) set of homogeneous vectors
-	idx = xyz[2] > 0
-	return xyz[:,idx]
+	return xyz[:,only_positive_z_idx(xyz)]
+
+def only_within_image_idx(image_shape, uv):
+	# Returns a list of the indices of only the points in uv within the image bounds
+	# The image convenion is that (0,0) is the center of the top left pixel
+	# image_shape should be a tuple (rows, columns), i.e., (y, x)
+	# uv should be a 3x1 set of homogeneous 2D vectors
+	return np.logical_and.reduce((uv[0] >= 0, uv[0] <= image_shape[1], uv[1] >= 0, uv[1] <= image_shape[0]))
 
 def only_within_image(image_shape, uv):
 	# Returns a list of only the points in uv within the image bounds
 	# The image convenion is that (0,0) is the center of the top left pixel
 	# image_shape should be a tuple (rows, columns), i.e., (y, x)
 	# uv should be a 3x1 set of homogeneous 2D vectors
-	idx = np.logical_and.reduce((uv[0] >= 0, uv[0] <= image_shape[1], uv[1] >= 0, uv[1] <= image_shape[0]))
-	return uv[:,idx]
+	return uv[:,only_within_image_idx(image_shape, uv)]
