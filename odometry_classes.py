@@ -48,11 +48,10 @@ class SLAM():
 	def try_finish_initialization(self, frame):
 		pairs = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
 		start_points, next_points = self.init_frame.keypoints[:,pairs[:,0]], frame.keypoints[:,pairs[:,1]]
-		start_points, next_points = start_points[:-1].T, next_points[:-1].T
-		mat, mask = cv2.findHomography(start_points, next_points, cv2.RANSAC)
-		print(mat)
-		print(mask)
-		print(mask.shape)
+		start_points, next_points = start_points[:-1].T, next_points[:-1].T # Make them lists of non-homogeneous vectors
+		mat, mask = cv2.findHomography(start_points, next_points, cv2.RANSAC, 25.0)
+		good_start_points = start_points[mask.astype(bool).flatten()]
+		good_next_points = next_points[mask.astype(bool).flatten()]
 
 	def tracking_phase(self, frame):
 		pass #TODO

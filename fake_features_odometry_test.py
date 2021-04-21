@@ -17,7 +17,7 @@ def fake_match(desc1, desc2):
 
 slam = SLAM(fake_match)
 
-fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 15)
+fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 100)
 
 def fake_create_input_frame(index, fake_points):
 	img = data.images[index]
