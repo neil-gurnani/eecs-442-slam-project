@@ -64,10 +64,10 @@ class SLAM():
 		print(new_pos)
 		print(new_quat)
 
-		# import matplotlib.pyplot as plt
-		# plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
-		# plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red")
-		# plt.show()
+		import matplotlib.pyplot as plt
+		plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
+		plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red")
+		plt.show()
 
 		return new_pos, new_quat # TEMPORARY
 

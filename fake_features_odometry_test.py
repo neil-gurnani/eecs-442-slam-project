@@ -46,18 +46,20 @@ for i in range(n_images):
 # 	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("tab20"))
 # 	plt.pause(0.1)
 
+next_idx = 20
+
 slam.start_initialization(frames[0], data.image_groundtruths[0])
-scale = data.image_groundtruths[0].pos[0] / data.image_groundtruths[20].pos[0]
-new_pos, new_quat = slam.try_finish_initialization(frames[20], scale)
-print(data.image_groundtruths[20].pos)
-print(data.image_groundtruths[20].quat)
+scale = data.image_groundtruths[0].pos[0] / data.image_groundtruths[next_idx].pos[0]
+new_pos, new_quat = slam.try_finish_initialization(frames[next_idx], scale)
+print(data.image_groundtruths[next_idx].pos)
+print(data.image_groundtruths[next_idx].quat)
 print("The above should be close together.")
-pos_error = np.linalg.norm(new_pos - data.image_groundtruths[20].pos)
-rot_error = np.linalg.norm(new_quat - data.image_groundtruths[20].quat)
+pos_error = np.linalg.norm(new_pos - data.image_groundtruths[next_idx].pos)
+rot_error = np.linalg.norm(new_quat - data.image_groundtruths[next_idx].quat)
 print("Positional error: %f\t Rotation error:%f" % (pos_error, rot_error))
-# fig, (ax1, ax2) = plt.subplots(1, 2)
-# ax1.imshow(frames[0].img)
-# ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
-# ax2.imshow(frames[20].img)
-# ax2.scatter(frames[20].keypoints[0], frames[20].keypoints[1], c=frames[20].descriptors, cmap=plt.get_cmap("tab20"))
-# plt.show()
+fig, (ax1, ax2) = plt.subplots(1, 2)
+ax1.imshow(frames[0].img)
+ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
+ax2.imshow(frames[next_idx].img)
+ax2.scatter(frames[next_idx].keypoints[0], frames[next_idx].keypoints[1], c=frames[next_idx].descriptors, cmap=plt.get_cmap("tab20"))
+plt.show()
