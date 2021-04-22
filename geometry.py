@@ -14,7 +14,7 @@ class Pose():
 		self.t = t # Timestamp is optional
 
 	def __repr__(self):
-		return "<Pose pos:%s quat:%s t:%s>" % (self.pos.flatten(), self.quat, self.t)
+		return "<Pose pos:%s quat:%s t:%s>" % (self.pos.flatten()[:-1], self.quat, self.t)
 
 def identity_pose():
 	return Pose([0,0,0], identity_quat())
