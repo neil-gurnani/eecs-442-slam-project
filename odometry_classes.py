@@ -12,13 +12,17 @@ class MapPoint():
 		self.pos = pos # Should be a homogeneous 4x1 column vector
 		self.descriptor = descriptor
 
+	def __repr__(self):
+		return "<MapPoint pos:%s descriptor:%s>" % (self.pos.flatten()[:-1], self.descriptor)
+
 class Frame():
-	def __init__(self, img, keypoints, descriptors, intrinsic_mat):
+	def __init__(self, img, keypoints, descriptors, intrinsic_mat, t=None):
 		self.img = img
 		self.keypoints = keypoints # Should be a 3x1 set of homogeneous 2D vectors (in the image plane)
 		                           # By convention, the center of the top-left corner pixel is (0,0)
 		self.descriptors = descriptors # Should be in 1-1 correspondence with keypoints
 		self.intrinsic_mat = intrinsic_mat
+		self.t = t
 
 class Map():
 	def __init__(self):
@@ -48,7 +52,6 @@ class SLAM():
 			self.start_initialization(frame)
 
 	def try_finish_initialization(self, frame, scale):
-
 		# Get possible matches
 		pairs = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
 		start_points, next_points = self.init_frame.keypoints[:,pairs[:,0]], frame.keypoints[:,pairs[:,1]]
@@ -61,15 +64,18 @@ class SLAM():
 		mat = np.matmul(make_translation_matrix(t), homogenize_matrix(R)) # Maps from the old camera frame to the new camera frame
 		new_pos = np.matmul(mat, self.init_pose.pos)
 		new_quat = mat_to_quat(unhomogenize_matrix(np.matmul(mat, homogenize_matrix(quat_to_mat(self.init_pose.quat)))))
-		print(new_pos)
-		print(new_quat)
+		new_pose = Pose(new_pos, new_quat, t=frame.t)
+		# print(new_pose)
+		# print(new_pos)
+		# print(new_quat)
+		point_global = local_xyz_to_global_xyz(new_pose, point_4d)
 
-		import matplotlib.pyplot as plt
-		plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
-		plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red")
-		plt.show()
+		# import matplotlib.pyplot as plt
+		# plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
+		# plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red")
+		# plt.show()
 
-		return new_pos, new_quat # TEMPORARY
+		return new_pos, new_quat, point_global # TEMPORARY
 
 	def tracking_phase(self, frame):
 		pass #TODO

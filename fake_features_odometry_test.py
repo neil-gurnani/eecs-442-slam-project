@@ -50,10 +50,10 @@ next_idx = 20
 
 slam.start_initialization(frames[0], data.image_groundtruths[0])
 scale = data.image_groundtruths[0].pos[0] / data.image_groundtruths[next_idx].pos[0]
-new_pos, new_quat = slam.try_finish_initialization(frames[next_idx], scale)
-print(data.image_groundtruths[next_idx].pos)
-print(data.image_groundtruths[next_idx].quat)
-print("The above should be close together.")
+new_pos, new_quat, global_points = slam.try_finish_initialization(frames[next_idx], scale)
+# print(data.image_groundtruths[next_idx].pos)
+# print(data.image_groundtruths[next_idx].quat)
+# print("The above should be close together.")
 pos_error = np.linalg.norm(new_pos - data.image_groundtruths[next_idx].pos)
 rot_error = np.linalg.norm(new_quat - data.image_groundtruths[next_idx].quat)
 print("Positional error: %f\t Rotation error:%f" % (pos_error, rot_error))
