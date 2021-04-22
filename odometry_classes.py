@@ -61,8 +61,9 @@ class SLAM():
 		next_points_norm = cv2.undistortPoints(next_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
 
 		# Get essential matrix and filter out false matches
-		mat, mask = cv2.findEssentialMat(start_points_norm, next_points_norm, focal=1.0, pp=(0., 0.), method=cv2.RANSAC, prob=0.99999, threshold=0.1)
+		mat, mask = cv2.findEssentialMat(start_points_norm, next_points_norm, focal=1.0, pp=(0., 0.), method=cv2.RANSAC, prob=0.999, threshold=0.01)
 		mask_bool = mask.astype(bool).flatten()
+		print("Discarding %d points." % (len(start_points.T) - np.sum(mask_bool)))
 		good_start_points = start_points[:,mask_bool]
 		good_start_points_norm = start_points_norm[mask_bool,:,:]
 		good_next_points = next_points[:,mask_bool]
