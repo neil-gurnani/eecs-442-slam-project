@@ -54,6 +54,8 @@ class SLAM():
 		start_points, next_points = self.init_frame.keypoints[:,pairs[:,0]], frame.keypoints[:,pairs[:,1]]
 		start_points, next_points = start_points[:-1,:], next_points[:-1,:]
 
+		start_points[0,10] = start_points[0,10] + 25
+
 		# Normalize
 		point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat)
 
