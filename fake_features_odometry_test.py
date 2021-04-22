@@ -17,7 +17,7 @@ def fake_match(desc1, desc2):
 
 slam = SLAM(fake_match)
 
-fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 100)
+fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 250)
 
 def fake_create_input_frame(index, fake_points):
 	img = data.images[index]
@@ -30,7 +30,7 @@ def fake_create_input_frame(index, fake_points):
 	idx2 = only_within_image_idx(img.shape, uv_points)
 	final_points = uv_points[:,idx2]
 	final_descriptors = (fake_points_descriptors[idx1])[idx2]
-	return Frame(img, final_points, final_descriptors)
+	return Frame(img, final_points, final_descriptors, data.intrinsic_mat)
 
 frames = []
 n_images = len(data.images)
