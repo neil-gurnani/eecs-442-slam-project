@@ -34,6 +34,10 @@ def homogenize_matrix(mat):
 	new_mat[3,3] = 1
 	return new_mat
 
+def unhomogenize_matrix(mat):
+	# Converts a 4x4 homogeneous matrix to a 3x3 matrix
+	return mat[0:3,0:3]
+
 def homogenize_vectors(vecs):
 	# Converts a 3xn set of vectors to a 4xn set of homogeneous vectors
 	return np.pad(vecs, pad_width=((0,1),(0,0)), mode="constant", constant_values=1)

@@ -47,22 +47,29 @@ class SLAM():
 		else:
 			self.start_initialization(frame)
 
-	def try_finish_initialization(self, frame):
+	def try_finish_initialization(self, frame, scale):
 
 		# Get possible matches
 		pairs = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
 		start_points, next_points = self.init_frame.keypoints[:,pairs[:,0]], frame.keypoints[:,pairs[:,1]]
 		start_points, next_points = start_points[:-1,:], next_points[:-1,:]
 
-		start_points[0,10] = start_points[0,10] + 25
-
 		# Normalize
 		point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat)
+		t = t * scale # Scale for the first displacement only
+
+		mat = np.matmul(make_translation_matrix(t), homogenize_matrix(R)) # Maps from the old camera frame to the new camera frame
+		new_pos = np.matmul(mat, self.init_pose.pos)
+		new_quat = mat_to_quat(unhomogenize_matrix(np.matmul(mat, homogenize_matrix(quat_to_mat(self.init_pose.quat)))))
+		print(new_pos)
+		print(new_quat)
 
 		import matplotlib.pyplot as plt
 		plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
 		plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red")
 		plt.show()
+
+		return new_pos, new_quat # TEMPORARY
 
 	def tracking_phase(self, frame):
 		pass #TODO
