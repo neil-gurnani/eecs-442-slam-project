@@ -1,5 +1,6 @@
 import numpy as np
 import scipy, scipy.spatial
+import cv2
 
 class Pose():
 	def __init__(self, pos, quat, t=None):
@@ -114,3 +115,39 @@ def only_within_image(image_shape, uv):
 	# image_shape should be a tuple (rows, columns), i.e., (y, x)
 	# uv should be a 3x1 set of homogeneous 2D vectors
 	return uv[:,only_within_image_idx(image_shape, uv)]
+
+def triangulate(old_points, new_points, camera_mat):
+	# old_points and new_points should be 2xn sets of vectors
+	# camera_mat should be the intrinsic matrix, either 3x3 or 3x4
+	# Returns the 3d points as a 4xn set of homogeneous vectors in the coordinate frame of the new image
+	# Returns the rotation and translation to get from the old camera pose to the new camera pose
+	# Returns the mask of inlier points as a boolean array
+	# See: https://stackoverflow.com/questions/33906111/how-do-i-estimate-positions-of-two-cameras-in-opencv
+	if camera_mat.shape == (3,3):
+		camera_mat_3x3 = camera_mat
+	else:
+		camera_mat_3x3 = camera_mat[0:3,0:3]
+	old_points_norm = cv2.undistortPoints(old_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
+	new_points_norm = cv2.undistortPoints(new_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
+
+	# Get essential matrix and filter out false matches
+	mat, mask = cv2.findEssentialMat(old_points_norm, new_points_norm, focal=1.0, pp=(0., 0.), method=cv2.RANSAC, prob=0.999, threshold=0.01)
+	mask_bool = mask.astype(bool).flatten()
+	print("Discarding %d points." % (len(old_points.T) - np.sum(mask_bool)))
+	good_old_points = old_points[:,mask_bool]
+	good_old_points_norm = old_points_norm[mask_bool,:,:]
+	good_new_points = new_points[:,mask_bool]
+	good_new_points_norm = new_points_norm[mask_bool,:,:]
+
+	# Recover camera pose
+	points, R, t, mask = cv2.recoverPose(mat, good_old_points_norm, good_new_points_norm)
+	M_new = np.hstack((R, t))
+	M_old = np.hstack((np.eye(3, 3), np.zeros((3, 1))))
+	P_new = np.dot(camera_mat_3x3,  M_new)
+	P_old = np.dot(camera_mat_3x3,  M_old)
+
+	# Triangulate in 3D
+	point_4d_hom = cv2.triangulatePoints(P_old, P_new, good_old_points, good_new_points)
+	point_4d = point_4d_hom / np.tile(point_4d_hom[-1, :], (4, 1))
+
+	return point_4d, R, t, mask_bool

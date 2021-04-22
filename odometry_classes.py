@@ -48,8 +48,6 @@ class SLAM():
 			self.start_initialization(frame)
 
 	def try_finish_initialization(self, frame):
-		# See: https://stackoverflow.com/questions/33906111/how-do-i-estimate-positions-of-two-cameras-in-opencv
-		camera_mat_3x3 = frame.intrinsic_mat[0:3,0:3]
 
 		# Get possible matches
 		pairs = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
@@ -57,28 +55,7 @@ class SLAM():
 		start_points, next_points = start_points[:-1,:], next_points[:-1,:]
 
 		# Normalize
-		start_points_norm = cv2.undistortPoints(start_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
-		next_points_norm = cv2.undistortPoints(next_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
-
-		# Get essential matrix and filter out false matches
-		mat, mask = cv2.findEssentialMat(start_points_norm, next_points_norm, focal=1.0, pp=(0., 0.), method=cv2.RANSAC, prob=0.999, threshold=0.01)
-		mask_bool = mask.astype(bool).flatten()
-		print("Discarding %d points." % (len(start_points.T) - np.sum(mask_bool)))
-		good_start_points = start_points[:,mask_bool]
-		good_start_points_norm = start_points_norm[mask_bool,:,:]
-		good_next_points = next_points[:,mask_bool]
-		good_next_points_norm = next_points_norm[mask_bool,:,:]
-
-		# Recover camera pose
-		points, R, t, mask = cv2.recoverPose(mat, good_start_points_norm, good_next_points_norm)
-		M_next = np.hstack((R, t))
-		M_start = np.hstack((np.eye(3, 3), np.zeros((3, 1))))
-		P_next = np.dot(camera_mat_3x3,  M_next)
-		P_start = np.dot(camera_mat_3x3,  M_start)
-
-		# Triangulate in 3D
-		point_4d_hom = cv2.triangulatePoints(P_start, P_next, good_start_points, good_next_points)
-		point_4d = point_4d_hom / np.tile(point_4d_hom[-1, :], (4, 1))
+		point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat)
 
 		import matplotlib.pyplot as plt
 		plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
