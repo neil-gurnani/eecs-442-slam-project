@@ -79,7 +79,6 @@ for i in range(1, n_images):
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
 			real_positions.append(act_pose.pos.flatten()[:-1])
 			est_positions.append(est_pose.pos.flatten()[:-1])
-			break
 	else:
 		slam.track_next_frame(frames[i])
 		est_pose = slam.global_map.camera_poses[-1]
@@ -89,13 +88,7 @@ for i in range(1, n_images):
 		print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
 		real_positions.append(act_pose.pos.flatten()[:-1])
 		est_positions.append(est_pose.pos.flatten()[:-1])
-
-print(fake_points[0])
-print(fake_points[1])
-print(fake_points[2])
-print(slam.local_map.map_points[0])
-print(slam.local_map.map_points[1])
-print(slam.local_map.map_points[2])
+		break
 
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)
