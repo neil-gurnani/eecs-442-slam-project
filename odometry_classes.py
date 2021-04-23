@@ -37,6 +37,10 @@ class Map():
 		# Add a list of map_points
 		self.map_points = self.map_points + map_points
 
+	def add_frame(self, frame, pose):
+		self.frames.append(frame)
+		self.camera_poses.append(pose)
+
 class SLAM():
 	def __init__(self, match_descriptors_func):
 		self.local_map = Map()
@@ -97,8 +101,10 @@ class SLAM():
 		else:
 			print("Found sufficient parallax! Finishing initialization.")
 			self.has_finished_initialization = True
-			self.local_map.add_map_points(map_points)
-			self.global_map.add_map_points(map_points)
+			for map_obj in [self.local_map, self.global_map]:
+				map_obj.add_map_points(map_points)
+				map_obj.add_frame(self.init_frame, self.init_pose)
+				map_obj.add_frame(frame, new_pose)
 			return
 
 	def track_next_frame(self, frame):
