@@ -116,6 +116,7 @@ class SLAM():
 
 		# Match frame keypoints with map points
 		pairs = self.match_descriptors(frame.descriptors, descriptors)
+		print("Num matches: %d" % len(pairs))
 		frame_points, map_points = frame.keypoints[:,pairs[:,0]], map_point_coords[:,pairs[:,1]]
 		frame_points, map_points = frame_points[:-1,:], map_points[:-1,:]
 
