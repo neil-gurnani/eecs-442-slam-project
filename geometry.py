@@ -140,7 +140,7 @@ def triangulate(old_points, new_points, camera_mat):
 	# Get essential matrix and filter out false matches
 	mat, mask = cv2.findEssentialMat(old_points_norm, new_points_norm, focal=1.0, pp=(0., 0.), method=cv2.RANSAC, prob=0.999, threshold=0.001)
 	mask_bool = mask.astype(bool).flatten()
-	print("Discarding %d points." % (len(old_points.T) - np.sum(mask_bool)))
+	# print("Discarding %d points." % (len(old_points.T) - np.sum(mask_bool)))
 	good_old_points = old_points[:,mask_bool]
 	good_old_points_norm = old_points_norm[mask_bool,:,:]
 	good_new_points = new_points[:,mask_bool]

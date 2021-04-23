@@ -65,6 +65,9 @@ for i in range(n_images):
 
 slam.start_initialization(frames[0], data.image_groundtruths[0])
 for i in range(1, n_images):
+	print("\nProcessing frame %d" % i)
 	if not slam.has_finished_initialization:
 		scale = data.image_groundtruths[0].pos[0,0] / data.image_groundtruths[i].pos[0,0]
 		slam.try_finish_initialization(frames[i], scale)
+	else:
+		slam.track_next_frame(frames[i])
