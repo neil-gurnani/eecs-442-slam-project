@@ -148,7 +148,7 @@ def local_only_good_image_idx(intrinsic_mat, image_shape, xyz):
 	return uv[:,mask], np.where(mask)[0]
 	# NOTE: This could probably be optimized, so invalid points aren't projeced and such
 
-def triangulate(old_points, new_points, camera_mat):
+def triangulate(old_points, new_points, camera_mat, scale):
 	# old_points and new_points should be 2xn sets of vectors
 	# camera_mat should be the intrinsic matrix, either 3x3 or 3x4
 	# Returns the 3d points as a 4xn set of homogeneous vectors in the coordinate frame of the new image
@@ -173,8 +173,9 @@ def triangulate(old_points, new_points, camera_mat):
 
 	# Recover camera pose
 	points, R, t, mask = cv2.recoverPose(mat, good_new_points_norm, good_old_points_norm)
-	M_new = np.hstack((R, t))
-	M_old = np.hstack((np.eye(3, 3), np.zeros((3, 1))))
+	t = (t / np.linalg.norm(t)) * scale # Scale for the first displacement only
+	M_new = np.hstack((np.eye(3, 3), np.zeros((3, 1))))
+	M_old = np.hstack((R, t))
 	P_new = np.dot(camera_mat_3x3,  M_new)
 	P_old = np.dot(camera_mat_3x3,  M_old)
 

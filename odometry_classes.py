@@ -63,8 +63,7 @@ class SLAM():
 		descriptors = self.init_frame.descriptors[pairs[:,0]]
 
 		# Normalize
-		point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat)
-		t = (t / np.linalg.norm(t)) * scale # Scale for the first displacement only
+		point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat, scale)
 		descriptors = descriptors[mask]
 
 		# Compue the camera and point positions in the global frame
@@ -84,9 +83,13 @@ class SLAM():
 		next_vecs = next_vecs / np.linalg.norm(next_vecs, axis=0)
 		dprods = np.sum(np.multiply(start_vecs, next_vecs), axis=0)
 
-		# import matplotlib.pyplot as plt
+		import matplotlib.pyplot as plt
+		# plt.scatter(next_points[0], next_points[1], color="blue", s=20**2)
+		# plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red", s=8**2)
+		# plt.scatter(global_xyz_to_uv(new_pose, frame.intrinsic_mat, points_global)[0], global_xyz_to_uv(new_pose, frame.intrinsic_mat, points_global)[1], color="green", s=2**2)
+		# plt.show()
 		# plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
-		# plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red")
+		# plt.scatter(global_xyz_to_uv(self.init_pose, self.init_frame.intrinsic_mat, points_global)[0], global_xyz_to_uv(self.init_pose, self.init_frame.intrinsic_mat, points_global)[1], color="green", s=2**2)
 		# plt.show()
 
 		# Remove points with insufficient parallax
