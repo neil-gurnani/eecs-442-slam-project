@@ -17,7 +17,7 @@ def fake_match(desc1, desc2):
 
 slam = SLAM(fake_match)
 
-fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 50)
+fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 250)
 
 def fake_create_input_frame(index, fake_points):
 	img = data.images[index]
@@ -30,7 +30,7 @@ def fake_create_input_frame(index, fake_points):
 	idx2 = only_within_image_idx(img.shape, uv_points)
 	final_points = uv_points[:,idx2]
 	final_descriptors = (fake_points_descriptors[idx1])[idx2]
-	return Frame(img, final_points, final_descriptors, data.intrinsic_mat)
+	return Frame(img, final_points, final_descriptors, data.intrinsic_mat, t=data.image_timestamps[index], index=index)
 
 frames = []
 n_images = len(data.images)
@@ -46,20 +46,25 @@ for i in range(n_images):
 # 	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("tab20"))
 # 	plt.pause(0.1)
 
-next_idx = 20
+# next_idx = 5
+
+# slam.start_initialization(frames[0], data.image_groundtruths[0])
+# scale = data.image_groundtruths[0].pos[0,0] / data.image_groundtruths[next_idx].pos[0,0]
+# new_pose, global_points = slam.try_finish_initialization(frames[next_idx], scale)
+# pos_error = np.linalg.norm(new_pose.pos - data.image_groundtruths[next_idx].pos)
+# rot_error = np.linalg.norm(new_pose.quat - data.image_groundtruths[next_idx].quat)
+# print("Positional error: %f\t Rotation error:%f" % (pos_error, rot_error))
+# print(data.image_groundtruths[next_idx])
+# print(new_pose)
+# fig, (ax1, ax2) = plt.subplots(1, 2)
+# ax1.imshow(frames[0].img)
+# ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
+# ax2.imshow(frames[next_idx].img)
+# ax2.scatter(frames[next_idx].keypoints[0], frames[next_idx].keypoints[1], c=frames[next_idx].descriptors, cmap=plt.get_cmap("tab20"))
+# plt.show()
 
 slam.start_initialization(frames[0], data.image_groundtruths[0])
-scale = data.image_groundtruths[0].pos[0] / data.image_groundtruths[next_idx].pos[0]
-new_pos, new_quat, global_points = slam.try_finish_initialization(frames[next_idx], scale)
-# print(data.image_groundtruths[next_idx].pos)
-# print(data.image_groundtruths[next_idx].quat)
-# print("The above should be close together.")
-pos_error = np.linalg.norm(new_pos - data.image_groundtruths[next_idx].pos)
-rot_error = np.linalg.norm(new_quat - data.image_groundtruths[next_idx].quat)
-print("Positional error: %f\t Rotation error:%f" % (pos_error, rot_error))
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.imshow(frames[0].img)
-ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
-ax2.imshow(frames[next_idx].img)
-ax2.scatter(frames[next_idx].keypoints[0], frames[next_idx].keypoints[1], c=frames[next_idx].descriptors, cmap=plt.get_cmap("tab20"))
-plt.show()
+for i in range(1, n_images):
+	if not slam.has_finished_initialization:
+		scale = data.image_groundtruths[0].pos[0,0] / data.image_groundtruths[i].pos[0,0]
+		slam.try_finish_initialization(frames[i], scale)

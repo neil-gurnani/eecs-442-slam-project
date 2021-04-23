@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import pdb
+import math
 
 from geometry import *
 
@@ -16,13 +17,14 @@ class MapPoint():
 		return "<MapPoint pos:%s descriptor:%s>" % (self.pos.flatten()[:-1], self.descriptor)
 
 class Frame():
-	def __init__(self, img, keypoints, descriptors, intrinsic_mat, t=None):
+	def __init__(self, img, keypoints, descriptors, intrinsic_mat, t=None, index=None):
 		self.img = img
 		self.keypoints = keypoints # Should be a 3x1 set of homogeneous 2D vectors (in the image plane)
 		                           # By convention, the center of the top-left corner pixel is (0,0)
 		self.descriptors = descriptors # Should be in 1-1 correspondence with keypoints
 		self.intrinsic_mat = intrinsic_mat
 		self.t = t
+		self.index = index
 
 class Map():
 	def __init__(self):
@@ -45,12 +47,6 @@ class SLAM():
 		self.init_frame = frame
 		self.init_pose = ground_truth_pose
 
-	def next_frame(self, frame):
-		if not self.has_finished_initialization:
-			self.has_finished_initialization = self.try_finish_initialization(frame)
-		else:
-			self.start_initialization(frame)
-
 	def try_finish_initialization(self, frame, scale):
 		# Get possible matches
 		pairs = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
@@ -65,17 +61,35 @@ class SLAM():
 		new_pos = np.matmul(mat, self.init_pose.pos)
 		new_quat = mat_to_quat(unhomogenize_matrix(np.matmul(mat, homogenize_matrix(quat_to_mat(self.init_pose.quat)))))
 		new_pose = Pose(new_pos, new_quat, t=frame.t)
-		# print(new_pose)
-		# print(new_pos)
-		# print(new_quat)
-		point_global = local_xyz_to_global_xyz(new_pose, point_4d)
+		points_global = local_xyz_to_global_xyz(new_pose, point_4d)
+
+		# Compute the angle between the two frames for each point
+		start_vecs = (points_global - self.init_pose.pos)[0:3]
+		next_vecs = (points_global - new_pose.pos)[0:3]
+		start_vecs = start_vecs / np.linalg.norm(start_vecs, axis=0)
+		next_vecs = next_vecs / np.linalg.norm(next_vecs, axis=0)
+		dprods = np.sum(np.multiply(start_vecs, next_vecs), axis=0)
 
 		# import matplotlib.pyplot as plt
 		# plt.scatter(start_points[0], start_points[1], color="blue", s=20**2)
 		# plt.scatter(local_xyz_to_uv(frame.intrinsic_mat, point_4d)[0], local_xyz_to_uv(frame.intrinsic_mat, point_4d)[1], color="red")
 		# plt.show()
 
-		return new_pos, new_quat, point_global # TEMPORARY
+		# Remove points with insufficient parallax
+		cos1 = math.cos(1.0 * (math.pi / 180.0))
+		cos2 = math.cos(2.0 * (math.pi / 180.0))
+		mask = dprods < cos1
 
-	def tracking_phase(self, frame):
-		pass #TODO
+		if np.sum(mask) < 40: # Check that we have enough points
+			print("Not enough parallax points! Only found %d." % np.sum(mask))
+			return
+		elif np.mean(dprods[mask]) > cos2: # Check that the points we have are good overall
+			print("Average parallax insufficient! Needed %f, got %f." % (math.acos(cos2) * 180 / math.pi, math.acos(np.mean(dprods[mask])) * 180 / math.pi))
+			return
+
+		print("WE'RE DOING IT ON FRAME %d" % frame.index)
+		has_finished_initialization = True
+		return
+
+	def track_next_frame(self, frame):
+		pass # TODO
