@@ -123,6 +123,19 @@ def only_within_image(image_shape, uv):
 	# uv should be a 3x1 set of homogeneous 2D vectors
 	return uv[:,only_within_image_idx(image_shape, uv)]
 
+def local_only_good_image_idx(intrinsic_mat, image_shape, xyz):
+	# Given the camera intrinsic matrix (3x4), the image shape (with the convention that
+	# (0,0) is the center of the top-left pixel), as a tuple (rows, columns), i.e., (y,x),
+	# and xyz a 4xn set of homogenous vectors in the local frame.
+	# Return the uv coordinates of only those points with positive z that project within the image
+	# boundaries, and the corresponding indices in the original list
+	idx1 = only_positive_z_idx(xyz)
+	uv = local_xyz_to_uv(intrinsic_mat, xyz)
+	idx2 = only_within_image_idx(image_shape, uv)
+	mask = np.logical_and(idx1, idx2)
+	return uv[:,mask], np.where(mask)[0]
+	# NOTE: This could probably be optimized, so invalid points aren't projeced and such
+
 def triangulate(old_points, new_points, camera_mat):
 	# old_points and new_points should be 2xn sets of vectors
 	# camera_mat should be the intrinsic matrix, either 3x3 or 3x4

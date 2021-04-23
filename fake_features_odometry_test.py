@@ -25,11 +25,8 @@ def fake_create_input_frame(index, fake_points):
 	fake_points_coords = np.concatenate([fake_point.pos for fake_point in fake_points], axis=1)
 	fake_points_descriptors = np.array([fake_point.descriptor for fake_point in fake_points])
 	local_points = global_xyz_to_local_xyz(pose, fake_points_coords)
-	idx1 = only_positive_z_idx(local_points)
-	uv_points = local_xyz_to_uv(data.intrinsic_mat, local_points[:,idx1])
-	idx2 = only_within_image_idx(img.shape, uv_points)
-	final_points = uv_points[:,idx2]
-	final_descriptors = (fake_points_descriptors[idx1])[idx2]
+	final_points, idx = local_only_good_image_idx(data.intrinsic_mat, img.shape, local_points)
+	final_descriptors = fake_points_descriptors[idx]
 	return Frame(img, final_points, final_descriptors, data.intrinsic_mat, t=data.image_timestamps[index], index=index)
 
 frames = []
