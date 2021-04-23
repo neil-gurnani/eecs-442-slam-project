@@ -60,11 +60,16 @@ for i in range(n_images):
 # ax2.scatter(frames[next_idx].keypoints[0], frames[next_idx].keypoints[1], c=frames[next_idx].descriptors, cmap=plt.get_cmap("tab20"))
 # plt.show()
 
+real_positions = []
+est_positions = []
+
 slam.start_initialization(frames[0], data.image_groundtruths[0])
+real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
+est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 for i in range(1, n_images):
 	print("\nProcessing frame %d" % i)
 	if not slam.has_finished_initialization:
-		scale = data.image_groundtruths[0].pos[0,0] / data.image_groundtruths[i].pos[0,0]
+		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(frames[i], scale)
 		if(slam.has_finished_initialization):
 			est_pose = slam.global_map.camera_poses[-1]
@@ -72,6 +77,9 @@ for i in range(1, n_images):
 			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
 			quat_err = np.linalg.norm(est_pose.quat - act_pose.quat)
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
+			real_positions.append(act_pose.pos.flatten()[:-1])
+			est_positions.append(est_pose.pos.flatten()[:-1])
+			break
 	else:
 		slam.track_next_frame(frames[i])
 		est_pose = slam.global_map.camera_poses[-1]
@@ -79,3 +87,15 @@ for i in range(1, n_images):
 		pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
 		quat_err = np.linalg.norm(est_pose.quat - act_pose.quat)
 		print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
+		real_positions.append(act_pose.pos.flatten()[:-1])
+		est_positions.append(est_pose.pos.flatten()[:-1])
+
+print(fake_points[0])
+print(slam.local_map.map_points[0])
+
+real_positions = np.array(real_positions)
+est_positions = np.array(est_positions)
+
+plt.plot(real_positions[:,0], real_positions[:,1])
+plt.plot(est_positions[:,0], est_positions[:,1])
+plt.show()

@@ -64,13 +64,15 @@ class SLAM():
 
 		# Normalize
 		point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat)
-		t = t * scale # Scale for the first displacement only
+		t = (t / np.linalg.norm(t)) * scale # Scale for the first displacement only
 		descriptors = descriptors[mask]
 
 		# Compue the camera and point positions in the global frame
-		mat = np.matmul(make_translation_matrix(t), homogenize_matrix(R)) # Maps from the old camera frame to the new camera frame
-		new_pos = np.matmul(mat, self.init_pose.pos)
-		new_quat = mat_to_quat(unhomogenize_matrix(np.matmul(mat, homogenize_matrix(quat_to_mat(self.init_pose.quat)))))
+		mat = np.matmul(make_translation_matrix(t), homogenize_matrix(R)) # Maps from the new camera frame to the old camera frame
+		old_mat = np.matmul(make_translation_matrix(self.init_pose.pos), homogenize_matrix(quat_to_mat(self.init_pose.quat)))
+		total_mat = np.matmul(old_mat, mat)
+		new_pos = total_mat[:,3]
+		new_quat = mat_to_quat(unhomogenize_matrix(total_mat))
 		new_pose = Pose(new_pos, new_quat, t=frame.t)
 		points_global = local_xyz_to_global_xyz(new_pose, point_4d)
 		map_points = [MapPoint(points_global[:,i], descriptors[i]) for i in range(len(descriptors))]
