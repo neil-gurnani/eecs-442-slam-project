@@ -86,10 +86,10 @@ class SLAM():
 		elif np.mean(dprods[mask]) > cos2: # Check that the points we have are good overall
 			print("Average parallax insufficient! Needed %f, got %f." % (math.acos(cos2) * 180 / math.pi, math.acos(np.mean(dprods[mask])) * 180 / math.pi))
 			return
-
-		print("WE'RE DOING IT ON FRAME %d" % frame.index)
-		has_finished_initialization = True
-		return
+		else:
+			print("Found sufficient parallax! Finishing initialization.")
+			self.has_finished_initialization = True
+			return
 
 	def track_next_frame(self, frame):
 		pass # TODO
