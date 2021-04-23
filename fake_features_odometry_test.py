@@ -68,7 +68,8 @@ real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 for i in range(1, n_images):
 	print("\nProcessing frame %d" % i)
-	if not slam.has_finished_initialization:
+	# if not slam.has_finished_initialization:
+	if True:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(frames[i], scale)
 		if(slam.has_finished_initialization):
@@ -79,7 +80,7 @@ for i in range(1, n_images):
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
 			real_positions.append(act_pose.pos.flatten()[:-1])
 			est_positions.append(est_pose.pos.flatten()[:-1])
-			break
+			# break
 	else:
 		slam.track_next_frame(frames[i])
 		est_pose = slam.global_map.camera_poses[-1]
