@@ -30,6 +30,14 @@ def mat_to_quat(mat):
 	# Converts a 3x3 rotation matrix to a quaternion w+xi+yj+zk stored as [x,y,z,w]
 	return scipy.spatial.transform.Rotation.from_matrix(mat).as_quat()
 
+def rot_vec_to_mat(rot_vec):
+	# Converts a 3x1 rotation vector to a 3x3 rotation matrix
+	return scipy.spatial.transform.Rotation.from_rotvec(rot_vec.flatten()).as_matrix()
+
+def rot_vec_to_quat(rot_vec):
+	# Converts a 3x1 rotation vector to a quaternion w+xi+yj+zk stored as [x,y,z,w]
+	return scipy.spatial.transform.Rotation.from_rotvec(rot_vec.flatten()).as_quat()
+
 def homogenize_matrix(mat):
 	# Converts a 3x3 matrix to a 4x4 homogeneous matrix
 	new_mat = np.zeros((4,4))
