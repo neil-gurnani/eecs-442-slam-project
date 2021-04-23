@@ -159,20 +159,20 @@ def triangulate(old_points, new_points, camera_mat):
 		camera_mat_3x3 = camera_mat
 	else:
 		camera_mat_3x3 = camera_mat[0:3,0:3]
-	old_points_norm = cv2.undistortPoints(old_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
 	new_points_norm = cv2.undistortPoints(new_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
+	old_points_norm = cv2.undistortPoints(old_points, cameraMatrix=camera_mat_3x3, distCoeffs=None)
 
 	# Get essential matrix and filter out false matches
-	mat, mask = cv2.findEssentialMat(old_points_norm, new_points_norm, focal=1.0, pp=(0., 0.), method=cv2.RANSAC, prob=0.999, threshold=0.001)
+	mat, mask = cv2.findEssentialMat(new_points_norm, old_points_norm, focal=1.0, pp=(0., 0.), method=cv2.RANSAC, prob=0.999, threshold=0.001)
 	mask_bool = mask.astype(bool).flatten()
 	# print("Discarding %d points." % (len(old_points.T) - np.sum(mask_bool)))
-	good_old_points = old_points[:,mask_bool]
-	good_old_points_norm = old_points_norm[mask_bool,:,:]
 	good_new_points = new_points[:,mask_bool]
 	good_new_points_norm = new_points_norm[mask_bool,:,:]
+	good_old_points = old_points[:,mask_bool]
+	good_old_points_norm = old_points_norm[mask_bool,:,:]
 
 	# Recover camera pose
-	points, R, t, mask = cv2.recoverPose(mat, good_old_points_norm, good_new_points_norm)
+	points, R, t, mask = cv2.recoverPose(mat, good_new_points_norm, good_old_points_norm)
 	M_new = np.hstack((R, t))
 	M_old = np.hstack((np.eye(3, 3), np.zeros((3, 1))))
 	P_new = np.dot(camera_mat_3x3,  M_new)
