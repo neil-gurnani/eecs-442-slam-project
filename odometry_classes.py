@@ -113,3 +113,17 @@ class SLAM():
 		local_coords = global_xyz_to_local_xyz(self.local_map.camera_poses[-1], map_point_coords)
 		uv_points, idx = local_only_good_image_idx(frame.intrinsic_mat, frame.img.shape, local_coords)
 		descriptors = np.array([point.descriptor for point in self.local_map.map_points])[idx]
+
+		# Match frame keypoints with map points
+		pairs = self.match_descriptors(frame.descriptors, descriptors)
+		frame_points, map_points = frame.keypoints[:,pairs[:,0]], map_point_coords[:,pairs[:,1]]
+		frame_points, map_points = frame_points[:-1,:], map_points[:-1,:]
+
+		# Reshape according to this: https://stackoverflow.com/questions/33696082/error-using-solvepnpransac-function
+		frame_points = frame_points.T.reshape(-1,1,2)
+		map_points = map_points.T.reshape(-1,1,3)
+		camera_mat_3x3 = frame.intrinsic_mat[0:3,0:3]
+		suc, R, t, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, None)
+		# R, t are the rotation and translation from the camera frame to the world frame
+		# So in our pose scheme, they're literally the pose of the camera
+		camera_pose = Pose(t, rot_vec_to_quat(R), t=frame.t)
