@@ -57,6 +57,10 @@ def unhomogenize_vectors(vecs):
 	# Converts a 4xn set of homogeneous vectors to a 3xn set of vectors
 	return vecs[0:3,:]
 
+def homogeneous_norm(vec):
+	# Returns the l2-norm of a 4x1 or 3x1 homogeneous vector
+	return np.linalg.norm(vec.flatten()[:-1])
+
 def make_translation_matrix(vec):
 	# Converts a 3x1 vector or 4x1 homogeneous vector to a 4x4 homogeneous translation matrix
 	mat = np.eye(4)

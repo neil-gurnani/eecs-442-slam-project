@@ -68,3 +68,8 @@ for i in range(1, n_images):
 		slam.try_finish_initialization(frames[i], scale)
 	else:
 		slam.track_next_frame(frames[i])
+		est_pose = slam.global_map.camera_poses[-1]
+		act_pose = data.image_groundtruths[i]
+		pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
+		quat_err = np.linalg.norm(est_pose.quat - act_pose.quat)
+		print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
