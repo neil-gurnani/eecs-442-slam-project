@@ -108,4 +108,8 @@ class SLAM():
 			return
 
 	def track_next_frame(self, frame):
-		pass # TODO
+		# Find map points visible in the current frame, by looking at the previous frame's pose.
+		map_point_coords = np.array([point.pos.flatten() for point in self.local_map.map_points]).T
+		local_coords = global_xyz_to_local_xyz(self.local_map.camera_poses[-1], map_point_coords)
+		uv_points, idx = local_only_good_image_idx(frame.intrinsic_mat, frame.img.shape, local_coords)
+		descriptors = np.array([point.descriptor for point in self.local_map.map_points])[idx]
