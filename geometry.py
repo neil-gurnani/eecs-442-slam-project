@@ -76,7 +76,7 @@ def local_xyz_to_uv(intrinsic_mat, xyz):
 	xyz[0:3] = xyz[0:3] / xyz[2]
 	return np.matmul(intrinsic_mat, xyz)
 
-def global_xyz_to_local_xyz(camera_pose, xyz):
+def local_xyz_to_global_xyz(camera_pose, xyz):
 	# Transforms 3d points from the world frame to the camera frame
 	# Camera poses are given as transformations from local to global frame
 	# See: https://www.eth3d.net/slam_documentation
@@ -87,7 +87,7 @@ def global_xyz_to_local_xyz(camera_pose, xyz):
 	full_mat = np.matmul(trans_mat, rot_mat) # Rotate, then translate
 	return np.matmul(full_mat, xyz)
 
-def local_xyz_to_global_xyz(camera_pose, xyz):
+def global_xyz_to_local_xyz(camera_pose, xyz):
 	# Transforms 3d points from the camera frame to the world frame
 	# Camera poses are given as transformations from local to global frame
 	# See: https://www.eth3d.net/slam_documentation

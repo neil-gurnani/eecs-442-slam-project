@@ -68,7 +68,7 @@ class SLAM():
 		descriptors = descriptors[mask]
 
 		# Compue the camera and point positions in the global frame
-		mat = np.matmul(make_translation_matrix(t), homogenize_matrix(R)) # Maps from the new camera frame to the old camera frame
+		mat = np.matmul(homogenize_matrix(R).T, make_translation_matrix(-1 * t)) # Maps from the new camera frame to the old camera frame
 		old_mat = np.matmul(make_translation_matrix(self.init_pose.pos), homogenize_matrix(quat_to_mat(self.init_pose.quat)))
 		total_mat = np.matmul(old_mat, mat)
 		new_pos = total_mat[:,3]
