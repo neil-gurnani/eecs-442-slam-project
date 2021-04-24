@@ -22,6 +22,9 @@ def identity_pose():
 def identity_quat():
 	return np.array([0,0,0,1])
 
+def quat_error(q1, q2):
+	return min(np.linalg.norm(q1 - q2), np.linalg.norm(q1 + q2))
+
 def quat_to_mat(quat):
 	# Converts a quaternion w+xi+yj+zk stored as [x,y,z,w] to a 3x3 rotation matrix
 	return scipy.spatial.transform.Rotation.from_quat(quat).as_matrix()
