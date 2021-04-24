@@ -78,7 +78,7 @@ def homogeneous_norm(vec):
 def make_translation_matrix(vec):
 	# Converts a 3x1 vector or 4x1 homogeneous vector to a 4x4 homogeneous translation matrix
 	mat = np.eye(4)
-	mat[0:3,3] = vec[0:3,0]
+	mat[0:3,3] = vec.flatten()[0:3]
 	return mat
 
 def local_xyz_to_uv(intrinsic_mat, xyz):
