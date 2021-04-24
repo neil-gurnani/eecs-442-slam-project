@@ -122,7 +122,7 @@ class SLAM():
 		# Match frame keypoints with map points
 		pairs = self.match_descriptors(frame.descriptors, descriptors)
 		print("Num matches: %d" % len(pairs))
-		frame_points, map_points = frame.keypoints[:,pairs[:,0]], map_point_coords[:,pairs[:,1]]
+		frame_points, map_points = frame.keypoints[:,pairs[:,0]], (map_point_coords[:,idx])[:,pairs[:,1]]
 		frame_points, map_points = frame_points[:-1,:], map_points[:-1,:]
 
 		# Reshape according to this: https://stackoverflow.com/questions/33696082/error-using-solvepnpransac-function
@@ -131,7 +131,7 @@ class SLAM():
 		camera_mat_3x3 = frame.intrinsic_mat[0:3,0:3]
 
 		# Actually find the camera position
-		suc, R_vec, t_vec, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, None)
+		suc, R_vec, t_vec, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, None, iterationsCount=10000, reprojectionError=2.0, confidence=0.999)
 		# R, t are the rotation and translation from the world frame to the camera frame
 		# So in our pose scheme, we have to use their inverses
 		pose_mat = np.matmul(homogenize_matrix(rot_vec_to_mat(R_vec)).T, make_translation_matrix(-1 * t_vec))

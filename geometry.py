@@ -40,6 +40,15 @@ def rot_vec_to_quat(rot_vec):
 	mat, _ = cv2.Rodrigues(rot_vec)
 	return mat_to_quat(mat)
 
+def mat_to_rot_vec(mat):
+	# Converts a 3x3 rotation matrix to a 3x1 rotation vector
+	rot_vec, _ = cv2.Rodrigues(mat)
+	return rot_vec
+
+def quat_to_rot_vec(quat):
+	# Converts a quaternion w+xi+yj+zk stored as [x,y,z,w] to a 3x3 rotation matrix
+	return mat_to_rot_vec(quat_to_mat(quat))
+
 def homogenize_matrix(mat):
 	# Converts a 3x3 matrix to a 4x4 homogeneous matrix
 	new_mat = np.zeros((4,4))
