@@ -142,6 +142,7 @@ class SLAM():
 
 		# Actually find the camera position
 		suc, R_vec, t_vec, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, None, iterationsCount=10000, reprojectionError=2.0, confidence=0.999)
+		print("solvePnPRansac success? %s" % suc)
 		# R, t are the rotation and translation from the world frame to the camera frame
 		# So in our pose scheme, we have to use their inverses
 		pose_mat = np.matmul(homogenize_matrix(rot_vec_to_mat(R_vec)).T, make_translation_matrix(-1 * t_vec))
