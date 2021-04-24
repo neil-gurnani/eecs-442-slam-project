@@ -25,15 +25,16 @@ class Frame():
 		self.t = t
 		self.index = index
 		if use_opencv_keypoints:
-			self.keypoint_coords = self.get_coords_from_keypoints()
+			self.get_coords_from_keypoints()
 		else:
 			self.keypoint_coords = self.keypoints
-		
+
 	def get_coords_from_keypoints(self):
-			# Should return a 3x1 set of homogeneous 2D vectors (in the image plane)
+			# Should return a 3xn set of homogeneous 2D vectors (in the image plane)
 			# By convention, the center of the top-left corner pixel is (0,0)
-			pass
-			return None
+			self.keypoint_coords = np.ones((3,len(self.keypoints)))
+			for i in range(len(self.keypoints)):
+				self.keypoint_coords[0:2,i] = self.keypoints[i].pt
 
 class Map():
 	def __init__(self):
