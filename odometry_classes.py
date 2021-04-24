@@ -17,14 +17,23 @@ class MapPoint():
 		return "<MapPoint pos:%s descriptor:%s>" % (self.pos.flatten()[:-1], self.descriptor)
 
 class Frame():
-	def __init__(self, img, keypoints, descriptors, intrinsic_mat, t=None, index=None):
+	def __init__(self, img, keypoints, descriptors, intrinsic_mat, t=None, index=None, use_opencv_keypoints=True):
 		self.img = img
-		self.keypoints = keypoints # Should be a 3x1 set of homogeneous 2D vectors (in the image plane)
-		                           # By convention, the center of the top-left corner pixel is (0,0)
+		self.keypoints = keypoints
 		self.descriptors = descriptors # Should be in 1-1 correspondence with keypoints
 		self.intrinsic_mat = intrinsic_mat
 		self.t = t
 		self.index = index
+		if use_opencv_keypoints:
+			self.keypoint_coords = self.get_coords_from_keypoints()
+		else:
+			self.keypoint_coords = self.keypoints
+		
+	def get_coords_from_keypoints(self):
+			# Should return a 3x1 set of homogeneous 2D vectors (in the image plane)
+			# By convention, the center of the top-left corner pixel is (0,0)
+			pass
+			return None
 
 class Map():
 	def __init__(self):
@@ -58,11 +67,11 @@ class SLAM():
 	def try_finish_initialization(self, frame, scale):
 		# Get possible matches
 		pairs = self.match_descriptors(self.init_frame.descriptors, frame.descriptors)
-		start_points, next_points = self.init_frame.keypoints[:,pairs[:,0]], frame.keypoints[:,pairs[:,1]]
+		start_points, next_points = self.init_frame.keypoint_coords[:,pairs[:,0]], frame.keypoint_coords[:,pairs[:,1]]
 		start_points, next_points = start_points[:-1,:], next_points[:-1,:]
 		descriptors = self.init_frame.descriptors[pairs[:,0]]
 
-		# Normalize
+		# Do the triangulation
 		point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat, scale)
 		descriptors = descriptors[mask]
 
@@ -122,7 +131,7 @@ class SLAM():
 		# Match frame keypoints with map points
 		pairs = self.match_descriptors(frame.descriptors, descriptors)
 		print("Num matches: %d" % len(pairs))
-		frame_points, map_points = frame.keypoints[:,pairs[:,0]], (map_point_coords[:,idx])[:,pairs[:,1]]
+		frame_points, map_points = frame.keypoint_coords[:,pairs[:,0]], (map_point_coords[:,idx])[:,pairs[:,1]]
 		frame_points, map_points = frame_points[:-1,:], map_points[:-1,:]
 
 		# Reshape according to this: https://stackoverflow.com/questions/33696082/error-using-solvepnpransac-function
@@ -140,3 +149,8 @@ class SLAM():
 		camera_pose = Pose(pos, quat, t=frame.t)
 		for map_obj in [self.local_map, self.global_map]:
 			map_obj.add_frame(frame, camera_pose)
+
+		# Local map update step
+		# Check if change in pose between this frame and the last keyframe is large enough
+		# If it is, triangulate, and add any new points to the local map
+		# *For now, just assume every frame is a keyframe*

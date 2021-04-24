@@ -27,7 +27,7 @@ def fake_create_input_frame(index, fake_points):
 	local_points = global_xyz_to_local_xyz(pose, fake_points_coords)
 	final_points, idx = local_only_good_image_idx(data.intrinsic_mat, img.shape, local_points)
 	final_descriptors = fake_points_descriptors[idx]
-	return Frame(img, final_points, final_descriptors, data.intrinsic_mat, t=data.image_timestamps[index], index=index)
+	return Frame(img, final_points, final_descriptors, data.intrinsic_mat, t=data.image_timestamps[index], index=index, use_opencv_keypoints=False)
 
 frames = []
 n_images = len(data.images)
