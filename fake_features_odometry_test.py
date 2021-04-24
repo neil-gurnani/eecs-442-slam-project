@@ -66,7 +66,8 @@ est_positions = []
 slam.start_initialization(frames[0], data.image_groundtruths[0])
 real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
-for i in range(1, n_images):
+# for i in range(1, n_images):
+for i in range(1, 25):
 	print("\nProcessing frame %d" % i)
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
@@ -88,7 +89,6 @@ for i in range(1, n_images):
 		print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
 		real_positions.append(act_pose.pos.flatten()[:-1])
 		est_positions.append(est_pose.pos.flatten()[:-1])
-		break
 
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)
