@@ -32,11 +32,13 @@ def mat_to_quat(mat):
 
 def rot_vec_to_mat(rot_vec):
 	# Converts a 3x1 rotation vector to a 3x3 rotation matrix
-	return scipy.spatial.transform.Rotation.from_rotvec(rot_vec.flatten()).as_matrix()
+	mat, _ = cv2.Rodrigues(rot_vec)
+	return mat
 
 def rot_vec_to_quat(rot_vec):
 	# Converts a 3x1 rotation vector to a quaternion w+xi+yj+zk stored as [x,y,z,w]
-	return scipy.spatial.transform.Rotation.from_rotvec(rot_vec.flatten()).as_quat()
+	mat, _ = cv2.Rodrigues(rot_vec)
+	return mat_to_quat(mat)
 
 def homogenize_matrix(mat):
 	# Converts a 3x3 matrix to a 4x4 homogeneous matrix

@@ -131,9 +131,12 @@ class SLAM():
 		camera_mat_3x3 = frame.intrinsic_mat[0:3,0:3]
 
 		# Actually find the camera position
-		suc, R, t, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, None)
-		# R, t are the rotation and translation from the camera frame to the world frame
-		# So in our pose scheme, they're literally the pose of the camera
-		camera_pose = Pose(t, rot_vec_to_quat(R), t=frame.t)
+		suc, R_vec, t_vec, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, None)
+		# R, t are the rotation and translation from the world frame to the camera frame
+		# So in our pose scheme, we have to use their inverses
+		pose_mat = np.matmul(homogenize_matrix(rot_vec_to_mat(R_vec)).T, make_translation_matrix(-1 * t_vec))
+		pos = pose_mat[:,3]
+		quat = mat_to_quat(unhomogenize_matrix(pose_mat))
+		camera_pose = Pose(pos, quat, t=frame.t)
 		for map_obj in [self.local_map, self.global_map]:
 			map_obj.add_frame(frame, camera_pose)
