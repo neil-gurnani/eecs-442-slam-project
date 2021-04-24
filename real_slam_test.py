@@ -16,10 +16,11 @@ def process_frame(index):
 	kp, des = orb.detectAndCompute(img, None)
 	return Frame(data.images[index], kp, des, data.intrinsic_mat, t=data.image_timestamps[index], index=index, use_opencv_keypoints=True)
 
-matcher = cv2.BFMatcher()
+matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+dist_thresh = 50.0
 def match_descriptors(desc1, desc2):
 	matches = matcher.match(desc1, desc2)
-	pairs = np.array([[match.queryIdx, match.trainIdx] for match in matches])
+	pairs = np.array([[match.queryIdx, match.trainIdx] for match in matches if match.distance <= dist_thresh])
 	return pairs
 
 # frame0 = process_frame(0)
@@ -52,6 +53,7 @@ for i in range(1, n_images):
 			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
 			quat_err = quat_error(est_pose.quat, act_pose.quat)
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
+			print("Map has %d points" % len(slam.local_map.map_points))
 	else:
 		slam.track_next_frame(current_frame)
 		est_pose = slam.global_map.camera_poses[-1]
