@@ -18,17 +18,16 @@ Run command:
 export DISPLAY=`grep -oP "(?<=nameserver ).+" /etc/resolv.conf`:0.0
 """
 
-def visualize(camera_pose, features_list):
-    # Pass in camera_pose as pose object and
-    # a list of features which are Points
-    
-    #camera_pose = np.array([3, 3, 3])
-    
+def visualize(camera_pose, features_list, map_obj):
+    # A map object will be passed in that contains all data needed
+    # map class is in odometry_classes
+
     # Creating the figure
     fig = plt.figure(figsize = (10, 7))
     ax = plt.axes(projection="3d")
 
     # add camera position
+    camera_pose = map_obj.self.camera_poses[-1]
     cam_x, cam_y, cam_z = geometry.unhomogenize_matrix(camera_pose.pos)
     ax.scatter3D(cam_x, cam_y, cam_z, color="red", label="camera")
 
@@ -43,6 +42,7 @@ def visualize(camera_pose, features_list):
     U,V,W = new_dir[0], new_dir[1], new_dir[2]
     ax.quiver(X,Y,Z,U,V,W)
 
+    # add coordinate axis
     X,Y,Z,U,V,W = 0,0,0,1,0,0
     ax.quiver(X,Y,Z,U,V,W, color='black')
     X,Y,Z,U,V,W = 0,0,0,0,1,0
@@ -50,10 +50,23 @@ def visualize(camera_pose, features_list):
     X,Y,Z,U,V,W = 0,0,0,0,0,1
     ax.quiver(X,Y,Z,U,V,W, color='black')
 
+    # Plot the camera path
+    for i in range(len(map_obj.camera_poses)-1):
+        cur_pose = map_obj.camera_pose[i]
+        next_pose = map_obj.camera_pose[i+1]
+
+        pos_mat = geometry.unhomogenize_matrix(cur_pose.pos)
+        X,Y,Z = pos_mat[0], pos_mat[1], pos_mat[2]
+
+        pos_mat = geometry.unhomogenize_matrix(cur_pose.pos)
+        U,V,W = pos_mat[0], pos_mat[1], pos_mat[2]
+
+        ax.quiver(X,Y,Z,U,V,W, color='red')
+
 
     # add each feature to plot
     x_coords, y_coords, z_coords = [], [], []
-    for point in features_list:
+    for point in map_obj.map:
         px, py, pz = point.pos[0:3]
         x_coords.append(px)
         y_coords.append(py)
