@@ -17,7 +17,7 @@ def fake_match(desc1, desc2):
 
 slam = SLAM(fake_match)
 
-fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 250)
+fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 80)
 
 def fake_create_input_frame(index, fake_points):
 	img = data.images[index]
@@ -66,16 +66,16 @@ est_positions = []
 slam.start_initialization(frames[0], data.image_groundtruths[0])
 real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
-# fig, (ax1, ax2) = plt.subplots(1, 2)
-# ax1.imshow(frames[0].img)
-# ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
-for i in range(1, n_images):
+fig, (ax1, ax2) = plt.subplots(1, 2)
+ax1.imshow(frames[0].img)
+ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
+for i in range(2, n_images):
 # for i in range(1, 25):
 	print("\nProcessing frame %d" % i)
-	# ax2.cla()
-	# ax2.imshow(frames[i].img)
-	# ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("tab20"))
-	# plt.pause(0.25)
+	ax2.cla()
+	ax2.imshow(frames[i].img)
+	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("tab20"))
+	plt.pause(0.25)
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(frames[i], scale)
@@ -84,6 +84,9 @@ for i in range(1, n_images):
 			act_pose = data.image_groundtruths[i]
 			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
 			quat_err = quat_error(est_pose.quat, act_pose.quat)
+			if quat_err > 0.5:
+				print("Catastrophic failure.")
+				exit(1)
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
 			real_positions.append(act_pose.pos.flatten()[:-1])
 			est_positions.append(est_pose.pos.flatten()[:-1])
