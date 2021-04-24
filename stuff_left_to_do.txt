@@ -1,0 +1,11 @@
+Things to do:
+
+Essential:
+1) integrate feature mapping, replace fake features
+2) add more points to map
+3) potentially compute homography
+4) write the report
+5) make presentation
+6) integrate with visualization
+7) maybe do projects with our own cameras (stretch)
+8) bundle adjustment optimization (stretch)
