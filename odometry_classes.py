@@ -122,7 +122,7 @@ class SLAM():
 				map_obj.add_frame(frame, new_pose)
 			return
 
-	def track_next_frame(self, frame):
+	def track_next_frame(self, frame, lastframe_pose):
 		# Find map points visible in the current frame, by looking at the previous frame's pose.
 		map_point_coords = np.array([point.pos.flatten() for point in self.local_map.map_points]).T
 		local_coords = global_xyz_to_local_xyz(self.local_map.camera_poses[-1], map_point_coords)
@@ -140,8 +140,16 @@ class SLAM():
 		map_points = map_points.T.reshape(-1,1,3)
 		camera_mat_3x3 = frame.intrinsic_mat[0:3,0:3]
 
+		# Estimate the last camera pose
+		pos = lastframe_pose.pos
+		quat = lastframe_pose.quat
+		input_Rvec = mat_to_rot_vec(quat_to_mat(quat).T)
+		input_tvec = -1 * unhomogenize_vectors(pos).flatten()
+
 		# Actually find the camera position
-		suc, R_vec, t_vec, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, None, iterationsCount=10000, reprojectionError=2.0, confidence=0.999)
+		suc, R_vec, t_vec, mask = cv2.solvePnPRansac(map_points, frame_points, camera_mat_3x3, distCoeffs=None,
+		                                             rvec=input_Rvec, tvec=input_tvec, useExtrinsicGuess=True,
+		                                             iterationsCount=10000, reprojectionError=2.0, confidence=0.999)
 		print("solvePnPRansac success? %s" % suc)
 		# R, t are the rotation and translation from the world frame to the camera frame
 		# So in our pose scheme, we have to use their inverses
