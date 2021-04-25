@@ -179,6 +179,14 @@ class SLAM():
 			descriptors = last_keyframe.descriptors[pairs[:,0]]
 			point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat, dist)
 			descriptors = descriptors[mask]
+
+			mat = np.matmul(make_translation_matrix(t), homogenize_matrix(R)) # Maps from the new camera frame to the old camera frame
+			old_mat = np.matmul(make_translation_matrix(last_keyframe_pos.pos), homogenize_matrix(quat_to_mat(last_keyframe_pos.quat)))
+			total_mat = np.matmul(old_mat, mat)
+			new_pos = total_mat[:,3]
+			new_quat = mat_to_quat(unhomogenize_matrix(total_mat))
+			camera_pose = Pose(new_pos, new_quat, t=frame.t)
+
 			points_global = local_xyz_to_global_xyz(camera_pose, point_4d)
 			map_points = [MapPoint(points_global[:,i], descriptors[i]) for i in range(len(descriptors))]
 

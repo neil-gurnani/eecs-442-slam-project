@@ -13,7 +13,10 @@ data = Dataloader(dataset_name)
 def fake_match(desc1, desc2):
 	# Can maybe optimize this sort of function
 	# https://stackoverflow.com/questions/49247506/how-to-efficiently-find-the-indices-of-matching-elements-in-two-lists
-	return np.array([(xi, xp) for (xi, x) in enumerate(desc1) for (xp, y) in enumerate(desc2) if x==y])
+	pairs = np.array([(xi, xp) for (xi, x) in enumerate(desc1) for (xp, y) in enumerate(desc2) if x==y])
+	pairs = pairs[np.unique(pairs[:,0], return_index=True)[1]]
+	pairs = pairs[np.unique(pairs[:,1], return_index=True)[1]]
+	return pairs
 
 slam = SLAM(fake_match)
 
@@ -75,7 +78,7 @@ for i in range(2, n_images):
 	ax2.cla()
 	ax2.imshow(frames[i].img)
 	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("tab20"))
-	plt.pause(0.25)
+	plt.pause(0.00001)
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(frames[i], scale)

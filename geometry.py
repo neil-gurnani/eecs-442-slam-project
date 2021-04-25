@@ -198,3 +198,24 @@ def triangulate(old_points, new_points, camera_mat, scale):
 	point_4d = point_4d_hom / point_4d_hom[3]
 
 	return point_4d, R, t, mask_bool
+
+def triangulate_given_relative_transformation(old_points, new_points, camera_mat, old_to_new):
+	# old_points and new_points should be 2xn sets of vectors
+	# camera_mat should be the intrinsic matrix, either 3x3 or 3x4
+	# old_to_new should be the 4x4 homogeneous transformation matrix from the old camera frame
+	# to the new camera frame
+	# Returns the 3d points as a 4xn set of homogeneous vectors in the coordinate frame of the new image
+	if camera_mat.shape == (3,3):
+		camera_mat_3x3 = camera_mat
+	else:
+		camera_mat_3x3 = camera_mat[0:3,0:3]
+
+	M_new = np.hstack((np.eye(3, 3), np.zeros((3, 1))))
+	M_old = old_to_new[0:3,:]
+	P_new = np.dot(camera_mat_3x3,  M_new)
+	P_old = np.dot(camera_mat_3x3,  M_old)
+
+	# Triangulate in 3D
+	point_4d_hom = cv2.triangulatePoints(P_old, P_new, old_points, new_points)
+	point_4d = point_4d_hom / point_4d_hom[3]
+	return point_4d
