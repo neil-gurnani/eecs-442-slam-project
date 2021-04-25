@@ -37,16 +37,21 @@ class Frame():
 				self.keypoint_coords[0:2,i] = self.keypoints[i].pt
 
 class Map():
-	def __init__(self):
+	def __init__(self, max_map_points=np.inf):
 		self.frames = []
 		self.camera_poses = []
 		self.map_points = []
+		self.max_map_points = max_map_points
 		self.last_keyframe_idx = None
 		# Need some sort of data structure holding point correspondences
 
 	def add_map_points(self, map_points):
 		# Add a list of map_points
 		self.map_points = self.map_points + map_points
+		over_count = len(self.map_points) - self.max_map_points
+		if over_count > 0:
+			idx = np.random.choice(len(self.map_points), self.max_map_points)
+			self.map_points = [self.map_points[i] for i in idx]
 
 	def add_frame(self, frame, pose, keyframe=False):
 		self.frames.append(frame)
@@ -55,8 +60,8 @@ class Map():
 			self.last_keyframe_idx = len(self.frames) - 1
 
 class SLAM():
-	def __init__(self, match_descriptors_func):
-		self.local_map = Map()
+	def __init__(self, match_descriptors_func, n_local_map_points):
+		self.local_map = Map(n_local_map_points)
 		self.global_map = Map()
 		self.has_finished_initialization = False
 		self.match_descriptors = match_descriptors_func # This function should take in two lists of descriptors,
@@ -167,8 +172,10 @@ class SLAM():
 		# If it is, triangulate, and add any new points to the local map
 		# *For now, just assume every frame is a keyframe*
 		dist = homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[self.local_map.last_keyframe_idx].pos)
+		if dist > 0.3:
+			return False
 		print("dist, %f" % dist)
-		this_frame_keyframe = dist > 0.1
+		this_frame_keyframe = dist > 0.03
 		if this_frame_keyframe:
 			last_keyframe = self.local_map.frames[self.local_map.last_keyframe_idx]
 			last_keyframe_pos = self.local_map.camera_poses[self.local_map.last_keyframe_idx]
@@ -179,6 +186,14 @@ class SLAM():
 			descriptors = last_keyframe.descriptors[pairs[:,0]]
 			point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat, dist)
 			descriptors = descriptors[mask]
+
+			mat = np.matmul(make_translation_matrix(t), homogenize_matrix(R)) # Maps from the new camera frame to the old camera frame
+			old_mat = np.matmul(make_translation_matrix(last_keyframe_pos.pos), homogenize_matrix(quat_to_mat(last_keyframe_pos.quat)))
+			total_mat = np.matmul(old_mat, mat)
+			new_pos = total_mat[:,3]
+			new_quat = mat_to_quat(unhomogenize_matrix(total_mat))
+			camera_pose = Pose(new_pos, new_quat, t=frame.t)
+
 			points_global = local_xyz_to_global_xyz(camera_pose, point_4d)
 			map_points = [MapPoint(points_global[:,i], descriptors[i]) for i in range(len(descriptors))]
 
@@ -187,3 +202,4 @@ class SLAM():
 			if this_frame_keyframe:
 				print("Adding %d map points" % len(map_points))
 				map_obj.add_map_points(map_points)
+		return True
