@@ -103,6 +103,7 @@ for i in range(2, n_images):
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)
 
+plt.figure()
 plt.plot(real_positions[:,0], real_positions[:,1])
 plt.plot(est_positions[:,0], est_positions[:,1])
 plt.show()

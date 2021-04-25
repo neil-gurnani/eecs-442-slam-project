@@ -78,7 +78,7 @@ def homogeneous_norm(vec):
 def make_translation_matrix(vec):
 	# Converts a 3x1 vector or 4x1 homogeneous vector to a 4x4 homogeneous translation matrix
 	mat = np.eye(4)
-	mat[0:3,3] = vec[0:3,0]
+	mat[0:3,3] = vec.flatten()[0:3]
 	return mat
 
 def local_xyz_to_uv(intrinsic_mat, xyz):
@@ -195,6 +195,6 @@ def triangulate(old_points, new_points, camera_mat, scale):
 
 	# Triangulate in 3D
 	point_4d_hom = cv2.triangulatePoints(P_old, P_new, good_old_points, good_new_points)
-	point_4d = point_4d_hom / np.tile(point_4d_hom[-1, :], (4, 1))
+	point_4d = point_4d_hom / point_4d_hom[3]
 
 	return point_4d, R, t, mask_bool
