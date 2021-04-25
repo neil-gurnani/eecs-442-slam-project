@@ -6,6 +6,7 @@ from odometry_classes import MapPoint, Frame, Map, SLAM
 from geometry import *
 from dataloader import Dataloader
 import fake_features
+from visualize import visualize
 
 dataset_name = "plant_1"
 data = Dataloader(dataset_name)
@@ -69,16 +70,20 @@ est_positions = []
 slam.start_initialization(frames[0], data.image_groundtruths[0])
 real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.imshow(frames[0].img)
-ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
+#fig, (ax1, ax2) = plt.subplots(1, 2)
+#ax1.imshow(frames[0].img)
+#ax1.scatter(frames[0].keypoints[0], frames[0].keypoints[1], c=frames[0].descriptors, cmap=plt.get_cmap("tab20"))
+
+fig = plt.figure(figsize = (10, 7))
+ax = plt.axes(projection="3d")
+
 for i in range(2, n_images):
 # for i in range(1, 25):
 	print("\nProcessing frame %d" % i)
-	ax2.cla()
-	ax2.imshow(frames[i].img)
-	ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("tab20"))
-	plt.pause(0.00001)
+	#ax2.cla()
+	#ax2.imshow(frames[i].img)
+	#ax2.scatter(frames[i].keypoints[0], frames[i].keypoints[1], c=frames[i].descriptors, cmap=plt.get_cmap("tab20"))
+	#plt.pause(0.00001)
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(frames[i], scale)
@@ -96,6 +101,7 @@ for i in range(2, n_images):
 	else:
 		good = slam.track_next_frame(frames[i])
 		if good:
+			visualize(slam.global_map, ax)
 			est_pose = slam.global_map.camera_poses[-1]
 			act_pose = data.image_groundtruths[i]
 			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))

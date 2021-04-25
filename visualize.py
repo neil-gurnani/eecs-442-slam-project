@@ -44,17 +44,61 @@ def visualize(map_obj, ax):
     #ax.quiver(X,Y,Z,U,V,W)
     print(cam_z)
     # add coordinate axis
-    X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],0.5, 0, 0
-    ax.quiver(X,Y,Z,U,V,W, color='blue')
-    X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],0,0.5,0
-    ax.quiver(X,Y,Z,U,V,W, color='blue')
-    X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],0,0,0.5
-    print(W == cam_z[0]-0.5)
-    print(W)
-    print(cam_z[0]-0.5)
-    print(cam_z)
-    print("(%f, %f, %f) -> (%f, %f, %f)" % (X,Y,Z,U,V,W))
-    ax.quiver(X,Y,Z,U,V,W, color='blue')
+    #X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],0.5, 0, 0
+    #ax.quiver(X,Y,Z,U,V,W, color='blue')
+    #X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],0,0.5,0
+    ##ax.quiver(X,Y,Z,U,V,W, color='blue')
+    #X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],0,0,0.5
+    #print(W == cam_z[0]-0.5)
+    #print(W)
+    #print(cam_z[0]-0.5)
+    #print(cam_z)
+    #print("(%f, %f, %f) -> (%f, %f, %f)" % (X,Y,Z,U,V,W))
+    #ax.quiver(X,Y,Z,U,V,W, color='blue')
+
+    # Rotate by the quaternion
+    P = np.array([0, 1, 0, 0])
+    R = np.array([0.707, 0.0, 0.707, 0.0])
+    Rprime = np.array([0.707, 0.0, -.707, 0.0])
+
+    def ham_prod(a,b):
+        # Returns the hamilton product in form [w,x,y,z]
+        # Used for multiplication of 2 quaternions
+        a1, a2 = a[0], b[0]
+        b1, b2 = a[1], b[1]
+        c1, c2 = a[2], b[2]
+        d1, d2 = a[3], b[3]
+
+        elt1 = a1*a2 - b1*b2 - c1*c2 - d1*d2
+        elt2 = a1*b2 + b1*a2 + c1*d2 - d1*c2
+        elt3 = a1*c2 - b1*d2 + c1*a2 + d1*b2
+        elt4 = a1*d2 + b1*c2 - c1*b2 + d1*a2
+
+        return np.array([elt1, elt2, elt3, elt4])
+
+    # Rotate coordinate axis by Camera Quaternion
+    temp = camera_pose.quat
+    cam_quat = np.array([temp[1], temp[2], temp[3], temp[0]])
+    cam_quat_prime = [cam_quat[0], -cam_quat[1], -cam_quat[2], cam_quat[3]]
+    xax = np.array([0,1,0,0])
+    yax = np.array([0,0,1,0])
+    zax = np.array([0,0,0,1])
+
+    x_rot = ham_prod(ham_prod(cam_quat, xax), cam_quat_prime)[1:]
+    y_rot = ham_prod(ham_prod(cam_quat, yax), cam_quat_prime)[1:]
+    z_rot = ham_prod(ham_prod(cam_quat, zax), cam_quat_prime)[1:]
+
+    # normalize the rotated axes (multiplied denom by 2 due to scale)
+    x_rot /= 2*np.linalg.norm(x_rot)
+    y_rot /= 2*np.linalg.norm(y_rot)
+    z_rot /= 2*np.linalg.norm(z_rot)
+
+    X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], x_rot[0], x_rot[1], x_rot[2]
+    ax.quiver(X,Y,Z,U,W,V, color='blue')
+    X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], y_rot[0], y_rot[1], y_rot[2]
+    ax.quiver(X,Y,Z,U,W,V, color='blue')
+    X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], z_rot[0], z_rot[1], z_rot[2]
+    ax.quiver(X,Y,Z,U,W,V, color='blue')
 
     # Plot the camera path
     for i in range(len(map_obj.camera_poses)-1):
