@@ -195,6 +195,6 @@ def triangulate(old_points, new_points, camera_mat, scale):
 
 	# Triangulate in 3D
 	point_4d_hom = cv2.triangulatePoints(P_old, P_new, good_old_points, good_new_points)
-	point_4d = point_4d_hom / np.tile(point_4d_hom[-1, :], (4, 1))
+	point_4d = point_4d_hom / point_4d_hom[3]
 
 	return point_4d, R, t, mask_bool
