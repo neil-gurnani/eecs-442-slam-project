@@ -57,9 +57,11 @@ def visualize(map_obj, ax):
     #ax.quiver(X,Y,Z,U,V,W, color='blue')
 
     # Rotate by the quaternion
-    P = np.array([0, 1, 0, 0])
-    R = np.array([0.707, 0.0, 0.707, 0.0])
-    Rprime = np.array([0.707, 0.0, -.707, 0.0])
+    # Example from stack overflow, RPR' is what we wnat
+    # ham(ham(R,P),R'')
+    #P = np.array([0, 1, 0, 0])
+    #R = np.array([0.707, 0.0, 0.707, 0.0])
+    #Rprime = np.array([0.707, 0.0, -.707, 0.0])
 
     def ham_prod(a,b):
         # Returns the hamilton product in form [w,x,y,z]
