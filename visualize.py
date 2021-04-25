@@ -42,7 +42,7 @@ def visualize(map_obj, ax):
     #X,Y,Z = cam_x[0], cam_y[0], cam_z[0]
     #U,V,W = new_dir[0], new_dir[1], new_dir[2]
     #ax.quiver(X,Y,Z,U,V,W)
-    print(cam_z)
+    ##print(cam_z)
     # add coordinate axis
     #X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],0.5, 0, 0
     #ax.quiver(X,Y,Z,U,V,W, color='blue')
@@ -92,7 +92,9 @@ def visualize(map_obj, ax):
     x_rot /= 2*np.linalg.norm(x_rot)
     y_rot /= 2*np.linalg.norm(y_rot)
     z_rot /= 2*np.linalg.norm(z_rot)
-
+    print("X rot: ", x_rot)
+    print("Y rot: ", y_rot)
+    print("Z rot: ", z_rot)
     X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], x_rot[0], x_rot[1], x_rot[2]
     ax.quiver(X,Y,Z,U,W,V, color='blue')
     X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], y_rot[0], y_rot[1], y_rot[2]
