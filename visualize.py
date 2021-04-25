@@ -43,11 +43,11 @@ def visualize(map_obj):
     ax.quiver(X,Y,Z,U,V,W)
 
     # add coordinate axis
-    X,Y,Z,U,V,W = 0,0,0,1,0,0
+    X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],cam_x[0]+1,cam_y[0],cam_z[0]
     ax.quiver(X,Y,Z,U,V,W, color='black')
-    X,Y,Z,U,V,W = 0,0,0,0,1,0
+    X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],cam_x[0],cam_y[0]+1,cam_z[0]
     ax.quiver(X,Y,Z,U,V,W, color='black')
-    X,Y,Z,U,V,W = 0,0,0,0,0,1
+    X,Y,Z,U,V,W = cam_x[0],cam_y[0],cam_z[0],cam_x[0],cam_y[0],cam_z[0]+1
     ax.quiver(X,Y,Z,U,V,W, color='black')
 
     # Plot the camera path
@@ -78,7 +78,7 @@ def visualize(map_obj):
     ax.set_ylabel('Y axis')
     ax.set_zlabel('Z axis')
 
-    # Set scale
+    # Set scale                  ----> EDIT THIS
     ax.set_xlim(-5,5)
     ax.set_ylim(-5,5)
     ax.set_zlim(-5,5)
