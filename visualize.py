@@ -94,15 +94,15 @@ def visualize(map_obj, ax):
     x_rot /= 2*np.linalg.norm(x_rot)
     y_rot /= 2*np.linalg.norm(y_rot)
     z_rot /= 2*np.linalg.norm(z_rot)
-    print("X rot: ", x_rot)
-    print("Y rot: ", y_rot)
-    print("Z rot: ", z_rot)
+    # print("X rot: ", x_rot)
+    # print("Y rot: ", y_rot)
+    # print("Z rot: ", z_rot)
     X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], x_rot[0], x_rot[1], x_rot[2]
-    ax.quiver(X,Y,Z,U,W,V, color='blue')
+    ax.quiver(X,Y,Z,U,W,V, color='red')
     X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], y_rot[0], y_rot[1], y_rot[2]
     ax.quiver(X,Y,Z,U,W,V, color='blue')
     X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], z_rot[0], z_rot[1], z_rot[2]
-    ax.quiver(X,Y,Z,U,W,V, color='blue')
+    ax.quiver(X,Y,Z,U,W,V, color='green')
 
     # Plot the camera path
     for i in range(len(map_obj.camera_poses)-1):
