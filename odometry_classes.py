@@ -41,15 +41,18 @@ class Map():
 		self.frames = []
 		self.camera_poses = []
 		self.map_points = []
+		self.last_keyframe_idx = None
 		# Need some sort of data structure holding point correspondences
 
 	def add_map_points(self, map_points):
 		# Add a list of map_points
 		self.map_points = self.map_points + map_points
 
-	def add_frame(self, frame, pose):
+	def add_frame(self, frame, pose, keyframe=False):
 		self.frames.append(frame)
 		self.camera_poses.append(pose)
+		if keyframe:
+			self.last_keyframe_idx = len(self.frames) - 1
 
 class SLAM():
 	def __init__(self, match_descriptors_func):
@@ -118,11 +121,11 @@ class SLAM():
 			self.has_finished_initialization = True
 			for map_obj in [self.local_map, self.global_map]:
 				map_obj.add_map_points(map_points)
-				map_obj.add_frame(self.init_frame, self.init_pose)
-				map_obj.add_frame(frame, new_pose)
+				map_obj.add_frame(self.init_frame, self.init_pose, keyframe=True)
+				map_obj.add_frame(frame, new_pose, keyframe=True)
 			return
 
-	def track_next_frame(self, frame, lastframe_pose):
+	def track_next_frame(self, frame):
 		# Find map points visible in the current frame, by looking at the previous frame's pose.
 		map_point_coords = np.array([point.pos.flatten() for point in self.local_map.map_points]).T
 		local_coords = global_xyz_to_local_xyz(self.local_map.camera_poses[-1], map_point_coords)
@@ -141,8 +144,8 @@ class SLAM():
 		camera_mat_3x3 = frame.intrinsic_mat[0:3,0:3]
 
 		# Estimate the last camera pose
-		pos = lastframe_pose.pos
-		quat = lastframe_pose.quat
+		pos = self.local_map.camera_poses[-1].pos
+		quat = self.local_map.camera_poses[-1].quat
 		input_Rvec = mat_to_rot_vec(quat_to_mat(quat).T)
 		input_tvec = -1 * unhomogenize_vectors(pos).flatten()
 
@@ -158,10 +161,29 @@ class SLAM():
 		pos = pose_mat[:,3]
 		quat = mat_to_quat(unhomogenize_matrix(pose_mat))
 		camera_pose = Pose(pos, quat, t=frame.t)
-		for map_obj in [self.local_map, self.global_map]:
-			map_obj.add_frame(frame, camera_pose)
 
 		# Local map update step
 		# Check if change in pose between this frame and the last keyframe is large enough
 		# If it is, triangulate, and add any new points to the local map
 		# *For now, just assume every frame is a keyframe*
+		dist = homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[self.local_map.last_keyframe_idx].pos)
+		print("dist, %f" % dist)
+		this_frame_keyframe = dist > 0.1
+		if this_frame_keyframe:
+			last_keyframe = self.local_map.frames[self.local_map.last_keyframe_idx]
+			last_keyframe_pos = self.local_map.camera_poses[self.local_map.last_keyframe_idx]
+			# For now, just triangulate all points, and don't worry about duplicates
+			pairs = self.match_descriptors(last_keyframe.descriptors, frame.descriptors)
+			start_points, next_points = last_keyframe.keypoint_coords[:,pairs[:,0]], frame.keypoint_coords[:,pairs[:,1]]
+			start_points, next_points = start_points[:-1,:], next_points[:-1,:]
+			descriptors = last_keyframe.descriptors[pairs[:,0]]
+			point_4d, R, t, mask = triangulate(start_points, next_points, frame.intrinsic_mat, dist)
+			descriptors = descriptors[mask]
+			points_global = local_xyz_to_global_xyz(camera_pose, point_4d)
+			map_points = [MapPoint(points_global[:,i], descriptors[i]) for i in range(len(descriptors))]
+
+		for map_obj in [self.local_map, self.global_map]:
+			map_obj.add_frame(frame, camera_pose, keyframe=this_frame_keyframe)
+			if this_frame_keyframe:
+				print("Adding %d map points" % len(map_points))
+				map_obj.add_map_points(map_points)

@@ -91,7 +91,7 @@ for i in range(2, n_images):
 			real_positions.append(act_pose.pos.flatten()[:-1])
 			est_positions.append(est_pose.pos.flatten()[:-1])
 	else:
-		slam.track_next_frame(frames[i], slam.local_map.camera_poses[-1])
+		slam.track_next_frame(frames[i])
 		est_pose = slam.global_map.camera_poses[-1]
 		act_pose = data.image_groundtruths[i]
 		pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
@@ -103,6 +103,7 @@ for i in range(2, n_images):
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)
 
+plt.figure()
 plt.plot(real_positions[:,0], real_positions[:,1])
 plt.plot(est_positions[:,0], est_positions[:,1])
 plt.show()

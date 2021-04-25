@@ -55,7 +55,7 @@ for i in range(2, n_images):
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
 			print("Map has %d points" % len(slam.local_map.map_points))
 	else:
-		slam.track_next_frame(current_frame, slam.local_map.camera_poses[-1])
+		slam.track_next_frame(current_frame)
 		est_pose = slam.global_map.camera_poses[-1]
 		act_pose = data.image_groundtruths[i]
 		pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
