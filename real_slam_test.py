@@ -46,7 +46,7 @@ n_images = len(data.images)
 fig, (ax1, ax2) = plt.subplots(1, 2)
 ax1.imshow(init_frame.img)
 ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
-for i in range(2, n_images):
+for i in range(2, 100):
 	print("\nProcessing frame %d" % i)
 	current_frame = process_frame(i)
 	ax2.cla()
@@ -66,16 +66,17 @@ for i in range(2, n_images):
 			real_positions.append(act_pose.pos.flatten()[:-1])
 			est_positions.append(est_pose.pos.flatten()[:-1])
 	else:
-		slam.track_next_frame(current_frame)
-		est_pose = slam.global_map.camera_poses[-1]
-		act_pose = data.image_groundtruths[i]
-		pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
-		quat_err = quat_error(est_pose.quat, act_pose.quat)
-		print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
-		real_positions.append(act_pose.pos.flatten()[:-1])
-		est_positions.append(est_pose.pos.flatten()[:-1])
-		if pos_err > 5:
-			break
+		good = slam.track_next_frame(current_frame)
+		if good:
+			est_pose = slam.global_map.camera_poses[-1]
+			act_pose = data.image_groundtruths[i]
+			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
+			quat_err = quat_error(est_pose.quat, act_pose.quat)
+			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
+			real_positions.append(act_pose.pos.flatten()[:-1])
+			est_positions.append(est_pose.pos.flatten()[:-1])
+		else:
+			print("solvePnP failure (skipping).")
 
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)

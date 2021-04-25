@@ -94,14 +94,17 @@ for i in range(2, n_images):
 			real_positions.append(act_pose.pos.flatten()[:-1])
 			est_positions.append(est_pose.pos.flatten()[:-1])
 	else:
-		slam.track_next_frame(frames[i])
-		est_pose = slam.global_map.camera_poses[-1]
-		act_pose = data.image_groundtruths[i]
-		pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
-		quat_err = quat_error(est_pose.quat, act_pose.quat)
-		print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
-		real_positions.append(act_pose.pos.flatten()[:-1])
-		est_positions.append(est_pose.pos.flatten()[:-1])
+		good = slam.track_next_frame(frames[i])
+		if good:
+			est_pose = slam.global_map.camera_poses[-1]
+			act_pose = data.image_groundtruths[i]
+			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
+			quat_err = quat_error(est_pose.quat, act_pose.quat)
+			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
+			real_positions.append(act_pose.pos.flatten()[:-1])
+			est_positions.append(est_pose.pos.flatten()[:-1])
+		else:
+			print("solvePnP failure (skipping).")
 
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)

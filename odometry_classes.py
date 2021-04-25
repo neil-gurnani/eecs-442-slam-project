@@ -167,6 +167,8 @@ class SLAM():
 		# If it is, triangulate, and add any new points to the local map
 		# *For now, just assume every frame is a keyframe*
 		dist = homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[self.local_map.last_keyframe_idx].pos)
+		if dist > 0.3:
+			return False
 		print("dist, %f" % dist)
 		this_frame_keyframe = dist > 0.1
 		if this_frame_keyframe:
@@ -195,3 +197,4 @@ class SLAM():
 			if this_frame_keyframe:
 				print("Adding %d map points" % len(map_points))
 				map_obj.add_map_points(map_points)
+		return True
