@@ -18,7 +18,7 @@ def fake_match(desc1, desc2):
 	pairs = pairs[np.unique(pairs[:,1], return_index=True)[1]]
 	return pairs
 
-slam = SLAM(fake_match)
+slam = SLAM(fake_match, 2500)
 
 fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 80)
 

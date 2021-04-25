@@ -37,16 +37,20 @@ class Frame():
 				self.keypoint_coords[0:2,i] = self.keypoints[i].pt
 
 class Map():
-	def __init__(self):
+	def __init__(self, max_map_points=np.inf):
 		self.frames = []
 		self.camera_poses = []
 		self.map_points = []
+		self.max_map_points = max_map_points
 		self.last_keyframe_idx = None
 		# Need some sort of data structure holding point correspondences
 
 	def add_map_points(self, map_points):
 		# Add a list of map_points
 		self.map_points = self.map_points + map_points
+		over_count = len(self.map_points) - self.max_map_points
+		if over_count > 0:
+			self.map_points = self.map_points[over_count:]
 
 	def add_frame(self, frame, pose, keyframe=False):
 		self.frames.append(frame)
@@ -55,8 +59,8 @@ class Map():
 			self.last_keyframe_idx = len(self.frames) - 1
 
 class SLAM():
-	def __init__(self, match_descriptors_func):
-		self.local_map = Map()
+	def __init__(self, match_descriptors_func, n_local_map_points):
+		self.local_map = Map(n_local_map_points)
 		self.global_map = Map()
 		self.has_finished_initialization = False
 		self.match_descriptors = match_descriptors_func # This function should take in two lists of descriptors,
@@ -170,7 +174,7 @@ class SLAM():
 		if dist > 0.3:
 			return False
 		print("dist, %f" % dist)
-		this_frame_keyframe = dist > 0.1
+		this_frame_keyframe = dist > 0.03
 		if this_frame_keyframe:
 			last_keyframe = self.local_map.frames[self.local_map.last_keyframe_idx]
 			last_keyframe_pos = self.local_map.camera_poses[self.local_map.last_keyframe_idx]

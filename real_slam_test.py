@@ -32,7 +32,7 @@ def match_descriptors(desc1, desc2):
 # import pdb
 # pdb.set_trace
 
-slam = SLAM(match_descriptors)
+slam = SLAM(match_descriptors, 2500)
 
 init_frame = process_frame(0)
 slam.start_initialization(init_frame, data.image_groundtruths[0])
@@ -43,16 +43,17 @@ real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 
 n_images = len(data.images)
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.imshow(init_frame.img)
-ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
-for i in range(2, 100):
+# fig, (ax1, ax2) = plt.subplots(1, 2)
+# ax1.imshow(init_frame.img)
+# ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
+n_failures_in_a_row = 0
+for i in range(2, n_images):
 	print("\nProcessing frame %d" % i)
 	current_frame = process_frame(i)
-	ax2.cla()
-	ax2.imshow(current_frame.img)
-	ax2.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
-	plt.pause(0.25)
+	# ax2.cla()
+	# ax2.imshow(current_frame.img)
+	# ax2.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
+	# plt.pause(0.25)
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(current_frame, scale)
@@ -75,8 +76,12 @@ for i in range(2, 100):
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
 			real_positions.append(act_pose.pos.flatten()[:-1])
 			est_positions.append(est_pose.pos.flatten()[:-1])
+			n_failures_in_a_row = 0
 		else:
 			print("solvePnP failure (skipping).")
+			n_failures_in_a_row += 1
+	if n_failures_in_a_row > 10:
+		break
 
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)
