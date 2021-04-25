@@ -4,9 +4,7 @@ Essential:
 1) integrate feature mapping, replace fake features -> tommy
 2) add more points to map  -> tommy
 3) potentially compute homography  -> Nick
-4) write the report  -> Nick will start
-5) make presentation -> Nick will start
-6) integrate with visualization ->  Nick
-7) maybe do projects with our own cameras (stretch) -> Neil/James
-8) bundle adjustment optimization (stretch) -> we shall see
-9) show ground truth (camera trajectory) -> Nick
+4) integrate with visualization ->  Nick
+5) maybe do projects with our own cameras (stretch) -> Neil/James
+6) bundle adjustment optimization (stretch) -> we shall see
+7) show ground truth (camera trajectory) -> Nick
