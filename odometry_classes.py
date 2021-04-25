@@ -210,9 +210,18 @@ class SLAM():
 			points_global = local_xyz_to_global_xyz(camera_pose, point_4d)
 			map_points = [MapPoint(points_global[:,i], descriptors[i]) for i in range(len(descriptors))]
 
+			all_map_descriptors = [point.descriptor for point in self.local_map.map_points]
+			pairs = self.match_descriptors(descriptors, all_map_descriptors)
+			if len(pairs) == 0:
+				no_duplicate_map_points = map_points
+			else:
+				duplicates = pairs[:,0]
+				no_duplicate_map_points = [map_points[i] for i in range(len(map_points)) if i not in duplicates]
+				print("%d duplicates" % len(duplicates))
+
 		for map_obj in [self.local_map, self.global_map]:
 			map_obj.add_frame(frame, camera_pose, keyframe=this_frame_keyframe)
 			if this_frame_keyframe:
-				print("Adding %d map points" % len(map_points))
-				map_obj.add_map_points(map_points, frame.index)
+				print("Adding %d map points" % len(no_duplicate_map_points))
+				map_obj.add_map_points(no_duplicate_map_points, frame.index)
 		return True
