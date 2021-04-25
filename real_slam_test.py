@@ -32,7 +32,7 @@ def match_descriptors(desc1, desc2):
 # import pdb
 # pdb.set_trace
 
-slam = SLAM(match_descriptors, 5000)
+slam = SLAM(match_descriptors, 1000)
 
 init_frame = process_frame(0)
 slam.start_initialization(init_frame, data.image_groundtruths[0])

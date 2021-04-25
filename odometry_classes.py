@@ -52,8 +52,13 @@ class Map():
 		self.map_point_last_checked = self.map_point_last_checked + [frame_idx for _ in range(len(map_points))]
 		over_count = len(self.map_points) - self.max_map_points
 		if over_count > 0:
-			idx = np.random.choice(len(self.map_points), self.max_map_points)
-			self.map_points = [self.map_points[i] for i in idx]
+			new_idx = np.flip(np.argsort(self.map_point_last_checked))
+			self.map_points = [self.map_points[i] for i in new_idx]
+			self.map_point_last_checked = [self.map_point_last_checked[i] for i in new_idx]
+			# idx = np.random.choice(len(self.map_points), self.max_map_points)
+			# self.map_points = [self.map_points[i] for i in idx]
+			self.map_points = [self.map_points[i] for i in range(over_count,len(self.map_points))]
+			self.map_point_last_checked = [self.map_point_last_checked[i] for i in range(over_count,len(self.map_point_last_checked))]
 
 	def add_frame(self, frame, pose, keyframe=False):
 		self.frames.append(frame)
@@ -200,7 +205,7 @@ class SLAM():
 			total_mat = np.matmul(old_mat, mat)
 			new_pos = total_mat[:,3]
 			new_quat = mat_to_quat(unhomogenize_matrix(total_mat))
-			camera_pose = Pose(new_pos, new_quat, t=frame.t)
+			# camera_pose = Pose(new_pos, new_quat, t=frame.t)
 
 			points_global = local_xyz_to_global_xyz(camera_pose, point_4d)
 			map_points = [MapPoint(points_global[:,i], descriptors[i]) for i in range(len(descriptors))]
