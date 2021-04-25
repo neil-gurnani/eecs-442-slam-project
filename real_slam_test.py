@@ -11,7 +11,7 @@ dataset_name = "plant_1"
 data = Dataloader(dataset_name)
 
 orb = cv2.ORB_create(nfeatures=8000, edgeThreshold=0)
-def process_frame(index, brightness_adjustment=1.5):
+def process_frame(index, brightness_adjustment=2.0):
 	img = np.array(cv2.cvtColor(data.images[index], cv2.COLOR_RGB2GRAY) * 255 * brightness_adjustment, dtype=np.uint8)
 	kp, des = orb.detectAndCompute(img, None)
 	return Frame(data.images[index], kp, des, data.intrinsic_mat, t=data.image_timestamps[index], index=index, use_opencv_keypoints=True)

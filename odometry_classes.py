@@ -43,11 +43,13 @@ class Map():
 		self.map_points = []
 		self.max_map_points = max_map_points
 		self.last_keyframe_idx = None
+		self.map_point_last_checked = []
 		# Need some sort of data structure holding point correspondences
 
-	def add_map_points(self, map_points):
+	def add_map_points(self, map_points, frame_idx):
 		# Add a list of map_points
 		self.map_points = self.map_points + map_points
+		self.map_point_last_checked = self.map_point_last_checked + [frame_idx for _ in range(len(map_points))]
 		over_count = len(self.map_points) - self.max_map_points
 		if over_count > 0:
 			idx = np.random.choice(len(self.map_points), self.max_map_points)
@@ -58,6 +60,11 @@ class Map():
 		self.camera_poses.append(pose)
 		if keyframe:
 			self.last_keyframe_idx = len(self.frames) - 1
+
+
+	def update_keypoint_last_checked(self, points, frame_num):
+		for idx in points:
+			self.map_point_last_checked[idx] = frame_num
 
 class SLAM():
 	def __init__(self, match_descriptors_func, n_local_map_points):
@@ -125,7 +132,7 @@ class SLAM():
 			print("Found sufficient parallax! Finishing initialization.")
 			self.has_finished_initialization = True
 			for map_obj in [self.local_map, self.global_map]:
-				map_obj.add_map_points(map_points)
+				map_obj.add_map_points(map_points, frame.index)
 				map_obj.add_frame(self.init_frame, self.init_pose, keyframe=True)
 				map_obj.add_frame(frame, new_pose, keyframe=True)
 			return
@@ -142,6 +149,7 @@ class SLAM():
 		print("Num matches: %d" % len(pairs))
 		frame_points, map_points = frame.keypoint_coords[:,pairs[:,0]], (map_point_coords[:,idx])[:,pairs[:,1]]
 		frame_points, map_points = frame_points[:-1,:], map_points[:-1,:]
+		self.local_map.update_keypoint_last_checked(pairs[:,1], frame.index)
 
 		# Reshape according to this: https://stackoverflow.com/questions/33696082/error-using-solvepnpransac-function
 		frame_points = frame_points.T.reshape(-1,1,2)
@@ -201,5 +209,5 @@ class SLAM():
 			map_obj.add_frame(frame, camera_pose, keyframe=this_frame_keyframe)
 			if this_frame_keyframe:
 				print("Adding %d map points" % len(map_points))
-				map_obj.add_map_points(map_points)
+				map_obj.add_map_points(map_points, frame.index)
 		return True
