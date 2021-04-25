@@ -7,7 +7,7 @@ from odometry_classes import MapPoint, Frame, Map, SLAM
 from geometry import *
 from dataloader import Dataloader
 
-dataset_name = "plant_1"
+dataset_name = "sfm_lab_room_1"
 data = Dataloader(dataset_name)
 
 orb = cv2.ORB_create(nfeatures=8000, edgeThreshold=0)

@@ -53,12 +53,12 @@ class Map():
 		over_count = len(self.map_points) - self.max_map_points
 		if over_count > 0:
 			new_idx = np.flip(np.argsort(self.map_point_last_checked))
-			self.map_points = [self.map_points[i] for i in new_idx]
-			self.map_point_last_checked = [self.map_point_last_checked[i] for i in new_idx]
-			# idx = np.random.choice(len(self.map_points), self.max_map_points)
-			# self.map_points = [self.map_points[i] for i in idx]
-			self.map_points = [self.map_points[i] for i in range(over_count,len(self.map_points))]
-			self.map_point_last_checked = [self.map_point_last_checked[i] for i in range(over_count,len(self.map_point_last_checked))]
+			# self.map_points = [self.map_points[i] for i in new_idx]
+			# self.map_point_last_checked = [self.map_point_last_checked[i] for i in new_idx]
+			# self.map_points = [self.map_points[i] for i in range(over_count,len(self.map_points))]
+			# self.map_point_last_checked = [self.map_point_last_checked[i] for i in range(over_count,len(self.map_point_last_checked))]
+			idx = np.random.choice(len(self.map_points), self.max_map_points)
+			self.map_points = [self.map_points[i] for i in idx]
 
 	def add_frame(self, frame, pose, keyframe=False):
 		self.frames.append(frame)
@@ -183,10 +183,9 @@ class SLAM():
 		# Local map update step
 		# Check if change in pose between this frame and the last keyframe is large enough
 		# If it is, triangulate, and add any new points to the local map
-		# *For now, just assume every frame is a keyframe*
-		dist = homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[self.local_map.last_keyframe_idx].pos)
-		if dist > 0.3:
+		if homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[-1].pos) > 0.5:
 			return False
+		dist = homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[self.local_map.last_keyframe_idx].pos)
 		print("dist, %f" % dist)
 		this_frame_keyframe = dist > 0.03
 		if this_frame_keyframe:
