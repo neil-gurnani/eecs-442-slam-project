@@ -80,10 +80,10 @@ def visualize(map_obj, ax):
 
     # Rotate coordinate axis by Camera Quaternion
     temp = camera_pose.quat
-    cam_quat = np.array([temp[1], temp[2], temp[3], temp[0]])
+    cam_quat = np.array([temp[3], temp[0], temp[1], temp[2]])
     cam_quat_prime = [cam_quat[0], -cam_quat[1], -cam_quat[2], cam_quat[3]]
-    xax = np.array([0,1,0,0])
-    yax = np.array([0,0,1,0])
+    xax = np.array([0,-1,0,0])
+    yax = np.array([0,0,-1,0])
     zax = np.array([0,0,0,1])
 
     x_rot = ham_prod(ham_prod(cam_quat, xax), cam_quat_prime)[1:]
