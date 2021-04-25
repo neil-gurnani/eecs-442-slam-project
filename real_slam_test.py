@@ -7,7 +7,7 @@ from odometry_classes import MapPoint, Frame, Map, SLAM
 from geometry import *
 from dataloader import Dataloader
 
-dataset_name = "sfm_lab_room_1"
+dataset_name = "plant_1"
 data = Dataloader(dataset_name)
 
 orb = cv2.ORB_create(nfeatures=8000, edgeThreshold=0)
@@ -19,7 +19,7 @@ def process_frame(index, brightness_adjustment=1.5):
 matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
 dist_thresh = 50.0
 def match_descriptors(desc1, desc2):
-	print(len(desc1), len(desc2))
+	# print(len(desc1), len(desc2))
 	matches = matcher.match(desc1, desc2)
 	pairs = np.array([[match.queryIdx, match.trainIdx] for match in matches if match.distance <= dist_thresh])
 	pairs = pairs[np.unique(pairs[:,0], return_index=True)[1]]
@@ -32,7 +32,7 @@ def match_descriptors(desc1, desc2):
 # import pdb
 # pdb.set_trace
 
-slam = SLAM(match_descriptors, 250)
+slam = SLAM(match_descriptors, 5000)
 
 init_frame = process_frame(0)
 slam.start_initialization(init_frame, data.image_groundtruths[0])
@@ -43,17 +43,17 @@ real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 
 n_images = len(data.images)
-# fig, (ax1, ax2) = plt.subplots(1, 2)
-# ax1.imshow(init_frame.img)
-# ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
+fig, (ax1, ax2) = plt.subplots(1, 2)
+ax1.imshow(init_frame.img)
+ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
 n_failures_in_a_row = 0
-for i in range(2, n_images):
+for i in range(1, n_images):
 	print("\nProcessing frame %d" % i)
 	current_frame = process_frame(i)
-	# ax2.cla()
-	# ax2.imshow(current_frame.img)
-	# ax2.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
-	# plt.pause(0.25)
+	ax2.cla()
+	ax2.imshow(current_frame.img)
+	ax2.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
+	plt.pause(0.25)
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(current_frame, scale)
