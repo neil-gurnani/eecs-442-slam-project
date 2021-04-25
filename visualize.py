@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 import geometry
 from geometry import Pose
-from odometry_classes import MapPoint
+from odometry_classes import Map, MapPoint, Frame
 
 """
 This code should be able to run without errors on Mac.
@@ -18,7 +18,7 @@ Run command:
 export DISPLAY=`grep -oP "(?<=nameserver ).+" /etc/resolv.conf`:0.0
 """
 
-def visualize(camera_pose, features_list, map_obj):
+def visualize(map_obj):
     # A map object will be passed in that contains all data needed
     # map class is in odometry_classes
 
@@ -55,13 +55,7 @@ def visualize(camera_pose, features_list, map_obj):
         cur_pose = map_obj.camera_pose[i]
         next_pose = map_obj.camera_pose[i+1]
 
-        pos_mat = geometry.unhomogenize_matrix(cur_pose.pos)
-        X,Y,Z = pos_mat[0], pos_mat[1], pos_mat[2]
-
-        pos_mat = geometry.unhomogenize_matrix(cur_pose.pos)
-        U,V,W = pos_mat[0], pos_mat[1], pos_mat[2]
-
-        ax.quiver(X,Y,Z,U,V,W, color='red')
+        ax.plot3D(cur_pose, next_pose, color='red')
 
 
     # add each feature to plot
@@ -94,6 +88,3 @@ def visualize(camera_pose, features_list, map_obj):
     # show plot
     plt.show()
     print("Showing plot")
-
-test_pose = geometry.identity_pose()
-visualize(test_pose, [])
