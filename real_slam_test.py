@@ -10,7 +10,7 @@ from dataloader import Dataloader
 dataset_name = "sfm_lab_room_1"
 data = Dataloader(dataset_name)
 
-orb = cv2.ORB_create(nfeatures=10000, edgeThreshold=0)
+orb = cv2.ORB_create(nfeatures=8000, edgeThreshold=0)
 def process_frame(index, brightness_adjustment=1.5):
 	img = np.array(cv2.cvtColor(data.images[index], cv2.COLOR_RGB2GRAY) * 255 * brightness_adjustment, dtype=np.uint8)
 	kp, des = orb.detectAndCompute(img, None)
@@ -32,7 +32,7 @@ def match_descriptors(desc1, desc2):
 # import pdb
 # pdb.set_trace
 
-slam = SLAM(match_descriptors, 2500)
+slam = SLAM(match_descriptors, 250)
 
 init_frame = process_frame(0)
 slam.start_initialization(init_frame, data.image_groundtruths[0])

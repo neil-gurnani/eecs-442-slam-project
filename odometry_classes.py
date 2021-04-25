@@ -50,7 +50,8 @@ class Map():
 		self.map_points = self.map_points + map_points
 		over_count = len(self.map_points) - self.max_map_points
 		if over_count > 0:
-			self.map_points = self.map_points[over_count:]
+			idx = np.random.choice(len(self.map_points), self.max_map_points)
+			self.map_points = [self.map_points[i] for i in idx]
 
 	def add_frame(self, frame, pose, keyframe=False):
 		self.frames.append(frame)
