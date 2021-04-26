@@ -17,8 +17,7 @@ https://code.luasoftware.com/tutorials/wsl/show-matplotlib-in-wsl-ubuntu/
 Run command: 
 export DISPLAY=`grep -oP "(?<=nameserver ).+" /etc/resolv.conf`:0.0
 """
-
-def visualize(map_obj, ax):
+def visualize(map_obj, ax, Dataloader):
     # A map object will be passed in that contains all data needed
     # map class is in odometry_classes
 
@@ -26,6 +25,29 @@ def visualize(map_obj, ax):
     #fig = plt.figure(figsize = (10, 7))
     #ax = plt.axes(projection="3d")
     ax.clear()
+
+    # find the coordinate range:
+    xrang, yrang, zrang = [], [], []
+    
+    #camPos = geometry.unhomogenize_matrix(map_obj.camera_pose.pos)
+    for point in map_obj.map_points:
+        unhomog = geometry.unhomogenize_matrix(point.pos)
+        xrang.append(unhomog[0])
+        yrang.append(unhomog[1])
+        zrang.append(unhomog[2])
+
+    for cam_pos in map_obj.camera_poses:
+        unhomog = geometry.unhomogenize_matrix(cam_pos.pos)
+        xrang.append(unhomog[0])
+        yrang.append(unhomog[1])
+        zrang.append(unhomog[2])
+
+    xmin, xmax = min(xrang), max(xrang)
+    ymin, ymax = min(yrang), max(yrang)
+    zmin, zmax = min(zrang), max(zrang)
+    truemin = min([xmin, ymin, zmin])
+    truemax = max([xmax, ymax, zmax])
+
     # add camera position
     if len(map_obj.camera_poses) > 0:
         camera_pose = map_obj.camera_poses[-1]
@@ -104,14 +126,47 @@ def visualize(map_obj, ax):
     X,Y,Z,U,V,W = cam_x[0], cam_y[0], cam_z[0], z_rot[0], z_rot[1], z_rot[2]
     ax.quiver(X,Y,Z,U,W,V, color='green')
 
+
+    # Plot the ground truth path
+    curframe = len(map_obj.camera_poses)
+    groundtruth_arr = np.array(Dataloader.image_groundtruths)
+    xpoints, ypoints, zpoints = [], [], []
+    for i in range(curframe-1):
+        cur_pose = geometry.unhomogenize_matrix(groundtruth_arr[i].pos)[:3]
+        next_pose = geometry.unhomogenize_matrix(groundtruth_arr[i+1].pos)[:3]
+        x,y,z = cur_pose
+        u,v,w = next_pose
+        xpoints.append(x[0])
+        xpoints.append(u[0])
+        ypoints.append(y[0])
+        ypoints.append(v[0])
+        zpoints.append(z[0])
+        zpoints.append(w[0])
+
+        ##xpoints.append([x[0],u[0]])
+        #ypoints.append([y[0],v[0]])
+        ##zpoints.append([z[0],w[0]])
+        #print(xpoints)
+        ####ax.plot3D([x[0],u[0]], [y[0],v[0]],[z[0],w[0]], color='blue', label='True Path')
+
+    ax.plot3D(xpoints, ypoints, zpoints, color='blue', label='True Path')
+
+
     # Plot the camera path
-    for i in range(len(map_obj.camera_poses)-1):
+    xpoints, ypoints, zpoints = [], [], []
+    for i in range(curframe-1):
         cur_pose = geometry.unhomogenize_matrix(map_obj.camera_poses[i].pos)[:3]
         next_pose = geometry.unhomogenize_matrix(map_obj.camera_poses[i+1].pos)[:3]
         x,y,z = cur_pose
         u,v,w = next_pose
-        ax.plot3D([x[0],u[0]], [y[0],v[0]],[z[0],w[0]], color='black')
-
+        xpoints.append(x[0])
+        xpoints.append(u[0])
+        ypoints.append(y[0])
+        ypoints.append(v[0])
+        zpoints.append(z[0])
+        zpoints.append(w[0])
+        #ax.plot3D([x[0],u[0]], [y[0],v[0]],[z[0],w[0]], color='black', label='Real Path')
+    ax.plot3D(xpoints, ypoints, zpoints, color='black', label='Real Path')
 
     # add each feature to plot
     x_coords, y_coords, z_coords = [], [], []
@@ -134,16 +189,16 @@ def visualize(map_obj, ax):
     ax.set_zlabel('Z axis')
 
     # find max & min
-    xmin, xmax = cam_x[0]-2, cam_x[0]+2
-    ymin, ymax = cam_y[0]-2, cam_y[0]+2
-    zmin, zmax = cam_z[0]-2, cam_z[0]+2
+    #xmin, xmax = cam_x[0]-2, cam_x[0]+2
+    #ymin, ymax = cam_y[0]-2, cam_y[0]+2
+    #zmin, zmax = cam_z[0]-2, cam_z[0]+2
     #print("Minx %d, Max %d" %(xmin, xmax)) (-2,1)
     ##print("Miny %d, Max %d" %(ymin, ymax)) (-2,1)
     #print("Minz %d, Max %d" %(zmin, zmax)) (0,3)
     # Set scale                  ----> EDIT THIS
-    ax.set_xlim(-2,1)
-    ax.set_ylim(-2,1)
-    ax.set_zlim(0,3)
+    ax.set_xlim(xmin,xmax)#-2,1)
+    ax.set_ylim(ymin,ymax)#-2,1)
+    ax.set_zlim(zmin,zmax)##0,3)
     # Annotate the camera
     #ax.text(cam_x[0],cam_y[0],cam_z[0], "Camera")
 

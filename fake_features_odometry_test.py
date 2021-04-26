@@ -8,7 +8,7 @@ from dataloader import Dataloader
 import fake_features
 from visualize import visualize
 
-dataset_name = "plant_1"
+dataset_name = "table_3"
 data = Dataloader(dataset_name)
 
 def fake_match(desc1, desc2):
@@ -77,7 +77,7 @@ est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 fig = plt.figure(figsize = (10, 7))
 ax = plt.axes(projection="3d")
 
-for i in range(2, n_images):
+for i in range(10, n_images):
 # for i in range(1, 25):
 	print("\nProcessing frame %d" % i)
 	#ax2.cla()
@@ -101,7 +101,7 @@ for i in range(2, n_images):
 	else:
 		good = slam.track_next_frame(frames[i])
 		if good:
-			visualize(slam.global_map, ax)
+			visualize(slam.global_map, ax, data)
 			est_pose = slam.global_map.camera_poses[-1]
 			act_pose = data.image_groundtruths[i]
 			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
