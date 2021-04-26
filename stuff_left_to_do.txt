@@ -1,10 +1,13 @@
-Things to do:
+Things left to complete:
 
-Essential:
-1) integrate feature mapping, replace fake features -> tommy
-2) add more points to map  -> tommy
-3) potentially compute homography  -> Nick
-4) integrate with visualization ->  Nick
-5) maybe do projects with our own cameras (stretch) -> Neil/James
-6) bundle adjustment optimization (stretch) -> we shall see
-7) show ground truth (camera trajectory) -> Nick
+Presentation
+	Produce the demo video (top down view plus keypoints) -Tommy
+	Clarify simulation vs reality, emphasize that simulation works perfectly, reality doesn't -Nick
+
+Report
+	Clean up related work -Neil
+	Citations throughout -Tommy
+	Parallax figure -James
+	Essential matrix transformation -James
+	Keypoints figure -Tommy
+	Final trajectory figure -Tommy
