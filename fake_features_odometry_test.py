@@ -8,7 +8,7 @@ from dataloader import Dataloader
 import fake_features
 from visualize import visualize
 
-dataset_name = "plant_1"
+dataset_name = "table_3"
 data = Dataloader(dataset_name)
 
 def fake_match(desc1, desc2):
@@ -19,9 +19,9 @@ def fake_match(desc1, desc2):
 	pairs = pairs[np.unique(pairs[:,1], return_index=True)[1]]
 	return pairs
 
-slam = SLAM(fake_match, 250)
+slam = SLAM(fake_match, 500)
 
-fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 80)
+fake_points = fake_features.create_random_fake_map_points(data.image_groundtruths[0], 500)
 
 def fake_create_input_frame(index, fake_points):
 	img = data.images[index]
@@ -77,7 +77,7 @@ est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 fig = plt.figure(figsize = (10, 7))
 ax = plt.axes(projection="3d")
 
-for i in range(2, n_images):
+for i in range(10, n_images):
 # for i in range(1, 25):
 	print("\nProcessing frame %d" % i)
 	#ax2.cla()
