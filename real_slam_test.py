@@ -51,7 +51,7 @@ fig, (ax1, ax2) = plt.subplots(2, 1)
 # ax1.imshow(init_frame.img)
 # ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
 n_failures_in_a_row = 0
-for i in range(1, n_images)[::5]:
+for i in range(1, n_images)[::3]:
 	print("\nProcessing frame %d" % i)
 	current_frame = process_frame(i)
 	good = False
