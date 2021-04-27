@@ -123,8 +123,8 @@ class SLAM():
 		# plt.show()
 
 		# Remove points with insufficient parallax
-		cos1 = math.cos(1.0 * (math.pi / 180.0))
-		cos2 = math.cos(2.0 * (math.pi / 180.0))
+		cos1 = math.cos(3.0 * (math.pi / 180.0))
+		cos2 = math.cos(5.0 * (math.pi / 180.0))
 		mask = dprods < cos1
 
 		if np.sum(mask) < 40: # Check that we have enough points
