@@ -187,7 +187,7 @@ class SLAM():
 			return False
 		dist = homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[self.local_map.last_keyframe_idx].pos)
 		print("dist, %f" % dist)
-		this_frame_keyframe = dist > 0.25 or quat_error(camera_pose.quat, self.local_map.camera_poses[self.local_map.last_keyframe_idx].quat) > 0.1
+		this_frame_keyframe = dist > 0.1 or quat_error(camera_pose.quat, self.local_map.camera_poses[self.local_map.last_keyframe_idx].quat) > 0.1
 		if this_frame_keyframe:
 			last_keyframe = self.local_map.frames[self.local_map.last_keyframe_idx]
 			last_keyframe_pos = self.local_map.camera_poses[self.local_map.last_keyframe_idx]
