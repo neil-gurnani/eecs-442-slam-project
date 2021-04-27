@@ -54,10 +54,6 @@ n_failures_in_a_row = 0
 for i in range(1, n_images):
 	print("\nProcessing frame %d" % i)
 	current_frame = process_frame(i)
-	ax2.cla()
-	ax2.imshow(current_frame.img)
-	ax2.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
-	plt.pause(0.25)
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(current_frame, scale)
@@ -86,6 +82,14 @@ for i in range(1, n_images):
 			n_failures_in_a_row += 1
 	if n_failures_in_a_row > 10:
 		break
+	ax1.cla()
+	ax1.imshow(current_frame.img)
+	ax1.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
+	ax2.cla()
+	ax2.plot(np.array(real_positions)[:,0], np.array(real_positions)[:,1], color="orange", label="Ground Truth")
+	ax2.plot(np.array(est_positions)[:,0], np.array(est_positions)[:,1], color="black", label="Estimated")
+	ax2.legend()
+	plt.pause(0.25)
 
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)
