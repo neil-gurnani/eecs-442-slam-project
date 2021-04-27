@@ -183,11 +183,11 @@ class SLAM():
 		# Local map update step
 		# Check if change in pose between this frame and the last keyframe is large enough
 		# If it is, triangulate, and add any new points to the local map
-		if homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[-1].pos) > 0.5:
+		if homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[-1].pos) > 0.25:
 			return False
 		dist = homogeneous_norm(camera_pose.pos - self.local_map.camera_poses[self.local_map.last_keyframe_idx].pos)
 		print("dist, %f" % dist)
-		this_frame_keyframe = dist > 0.03 or quat_error(camera_pose.quat, self.local_map.camera_poses[self.local_map.last_keyframe_idx].quat) > 0.03
+		this_frame_keyframe = dist > 0.25 or quat_error(camera_pose.quat, self.local_map.camera_poses[self.local_map.last_keyframe_idx].quat) > 0.1
 		if this_frame_keyframe:
 			last_keyframe = self.local_map.frames[self.local_map.last_keyframe_idx]
 			last_keyframe_pos = self.local_map.camera_poses[self.local_map.last_keyframe_idx]

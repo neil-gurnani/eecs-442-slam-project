@@ -7,7 +7,7 @@ from odometry_classes import MapPoint, Frame, Map, SLAM
 from geometry import *
 from dataloader import Dataloader
 
-dataset_name = "sfm_lab_room_1"
+dataset_name = "table_3"
 data = Dataloader(dataset_name)
 
 orb = cv2.ORB_create(nfeatures=8000, edgeThreshold=0)
@@ -47,13 +47,14 @@ real_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 est_positions.append(data.image_groundtruths[0].pos.flatten()[:-1])
 
 n_images = len(data.images)
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.imshow(init_frame.img)
-ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
+fig, (ax1, ax2) = plt.subplots(2, 1)
+# ax1.imshow(init_frame.img)
+# ax1.scatter(init_frame.keypoint_coords[0], init_frame.keypoint_coords[1], s=2**2)
 n_failures_in_a_row = 0
-for i in range(1, n_images):
+for i in range(1, n_images)[::5]:
 	print("\nProcessing frame %d" % i)
 	current_frame = process_frame(i)
+	good = False
 	if not slam.has_finished_initialization:
 		scale = homogeneous_norm(data.image_groundtruths[0].pos - data.image_groundtruths[i].pos)
 		slam.try_finish_initialization(current_frame, scale)
@@ -71,6 +72,7 @@ for i in range(1, n_images):
 		if good:
 			est_pose = slam.global_map.camera_poses[-1]
 			act_pose = data.image_groundtruths[i]
+			# print("\t\t\t\t\t\t\t\t%s" % data.image_groundtruths_idx[i])
 			pos_err = np.linalg.norm(homogeneous_norm(est_pose.pos - act_pose.pos))
 			quat_err = quat_error(est_pose.quat, act_pose.quat)
 			print("Position error: %f Orientation error: %f" % (pos_err, quat_err))
@@ -80,21 +82,22 @@ for i in range(1, n_images):
 		else:
 			print("solvePnP failure (skipping).")
 			n_failures_in_a_row += 1
+		if good:
+			ax1.cla()
+			ax1.imshow(current_frame.img)
+			ax1.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
+			ax2.cla()
+			ax2.plot(np.array(real_positions)[:,0], np.array(real_positions)[:,1], color="orange", label="Ground Truth")
+			ax2.plot(np.array(est_positions)[:,0], np.array(est_positions)[:,1], color="black", label="Estimated")
+			ax2.legend()
+			plt.pause(0.001)
 	if n_failures_in_a_row > 10:
 		break
-	ax1.cla()
-	ax1.imshow(current_frame.img)
-	ax1.scatter(current_frame.keypoint_coords[0], current_frame.keypoint_coords[1], s=2**2)
-	ax2.cla()
-	ax2.plot(np.array(real_positions)[:,0], np.array(real_positions)[:,1], color="orange", label="Ground Truth")
-	ax2.plot(np.array(est_positions)[:,0], np.array(est_positions)[:,1], color="black", label="Estimated")
-	ax2.legend()
-	plt.pause(0.25)
 
 real_positions = np.array(real_positions)
 est_positions = np.array(est_positions)
 
-plt.figure()
-plt.plot(real_positions[:,0], real_positions[:,1])
-plt.plot(est_positions[:,0], est_positions[:,1])
+# plt.figure()
+# plt.plot(real_positions[:,0], real_positions[:,1])
+# plt.plot(est_positions[:,0], est_positions[:,1])
 plt.show()
