@@ -25,9 +25,8 @@ In order to fetch all of the data we collected, we simply ran the following shel
 ```bash
 chmod +x download_dataset.sh 
 ./download_dataset.sh
-
+```
 Running this shell script would effectively import all the data from the ETH3D website to our created **data** folder.
-
 
 
 ## Dependencies
