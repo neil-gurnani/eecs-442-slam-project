@@ -44,13 +44,13 @@ Running this shell script would effectively import all the data from the ETH3D w
 
 
 ## Useful Links and References
-* [OpenCV Documentation on Feature Extraction and Matching] https://docs.opencv.org/master/dc/dc3/tutorial_py_matcher.html
-* [OrbSLAM Monocular SLAM]https://openslam-org.github.io/orbslam.html
-* [Monoslam Real Time Camera SLAM]https://www.robots.ox.ac.uk/~lav/Papers/davison_etal_pami2007/davison_etal_pami2007.pdf
-* [Monocular SLAM for Visual Odometry]https://www.hindawi.com/journals/mpe/2012/676385/
-* [SURF, Speeded up Robust Features] https://people.ee.ethz.ch/~surf/eccv06.pdf
-* [Junction Tree Filters for SLAM]http://ai.stanford.edu/~paskin/slam/
-* [Distinctive Image Features from Scale Invariant Keypoints]https://people.eecs.berkeley.edu/~malik/cs294/lowe-ijcv04.pdf
-* [Other Monocular Visual Odometry Github Implementation]https://github.com/felixchenfy/Monocular-Visual-Odometry
+* [OpenCV Documentation on Feature Extraction and Matching](https://docs.opencv.org/master/dc/dc3/tutorial_py_matcher.html)
+* [OrbSLAM Monocular SLAM](https://openslam-org.github.io/orbslam.html)
+* [Monoslam Real Time Camera SLAM](https://www.robots.ox.ac.uk/~lav/Papers/davison_etal_pami2007/davison_etal_pami2007.pdf)
+* [Monocular SLAM for Visual Odometry](https://www.hindawi.com/journals/mpe/2012/676385/)
+* [SURF, Speeded up Robust Features](https://people.ee.ethz.ch/~surf/eccv06.pdf)
+* [Junction Tree Filters for SLAM](http://ai.stanford.edu/~paskin/slam/)
+* [Distinctive Image Features from Scale Invariant Keypoints](https://people.eecs.berkeley.edu/~malik/cs294/lowe-ijcv04.pdf)
+* [Other Monocular Visual Odometry Github Implementation](https://github.com/felixchenfy/Monocular-Visual-Odometry)
 
 
