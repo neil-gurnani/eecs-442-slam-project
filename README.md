@@ -2,14 +2,15 @@
 
 EECS 442 Slam Final Project
 
-
 ## Overview
 
 Our Computer Vision final project centered around Simultaneous localization and mapping (SLAM), which is a famous  problem in robotics,  where a computer  system  at-tempts to construct a map of its environment, while simul-taneously maintaining knowledge of its position within that map.
 
 The goal of our project is to produce an effective SLAM system using only a single, ordinary (2D) camera for sensory input. This type of camera is ubiquitous in our modern, digital world, so our SLAM algorithm could easily be applied to almost any mobile device. 
 
-A summary of our findings can be found in our [report](EECS_442_Computer_Vision_SLAM_Project.pdf) for [EECS 442: Computer Vision](https://web.eecs.umich.edu/~justincj/teaching/eecs442/WI2021/) course at the University of Michigan during the Winter 2021 Semester. You can view the latest report on [Overleaf](https://www.overleaf.com/project/608447d3ec80589a09854d0f).
+The Final Project Report Specification can be found in [report specification][EECS_442_Computer_Vision_Spec.pdf]
+
+A summary of our findings can be found in our [report](EECS_442_Computer_Vision_SLAM_Project.pdf) for [EECS 442: Computer Vision](https://web.eecs.umich.edu/~justincj/teaching/eecs442/WI2021/) course at the University of Michigan during the Winter 2021 Semester.   You can view our latest report on [Overleaf](https://www.overleaf.com/project/608447d3ec80589a09854d0f).
 
 Our source code for conducting SLAM and analyzing our data can be found in the **src** folder.
 
