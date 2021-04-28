@@ -21,7 +21,7 @@ The motivation for this project came from our first team meeting, where we disco
 We were able to obtain the data we needed for this project from the ETH3D dataset~\cite{Schops_2019_CVPR}. With the video sequences and ground truth camera poses taken from ETH3D, we were able to both qualitatively and quantitatively analyze the quality of our results. :
 * [ETH3D SLAM Datasets]("https://www.eth3d.net/data/slam/datasets/")
 
-In order to fetch all of the data we collected, we simply ran the following shell script: 
+In order to fetch all of the data we collected, we simply build and run the following shell script: 
 ```bash
 chmod +x download_dataset.sh 
 ./download_dataset.sh
