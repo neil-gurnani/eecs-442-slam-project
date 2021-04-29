@@ -19,7 +19,7 @@ Our source code for conducting SLAM and analyzing our data can be found in the *
 The motivation for this project came from our first team meeting, where we discovered a common interest in Autonomous Vehicles, as well as robotic systems that use advanced technniques such as SLAM. We came to the realization that SLAM has a vast number of real world practical applications across a growing variety of fields and disciplines. After a group conversation, we determined that this would be quite a fascinating project to move forward with to further explore our interest in this subdiscipline of Computer Vision.
 
 ## Data
-We were able to obtain the data we needed for this project from the ETH3D dataset~\cite{Schops_2019_CVPR}. With the video sequences and ground truth camera poses taken from ETH3D, we were able to both qualitatively and quantitatively analyze the quality of our results. :
+We were able to obtain the data we needed for this project from the ETH3D dataset. With the video sequences and ground truth camera poses taken from ETH3D, we were able to both qualitatively and quantitatively analyze the quality of our results. :
 * [ETH3D SLAM Datasets](https://www.eth3d.net/slam_datasets)
 
 In order to fetch all of the data we collected, we simply build and run the following shell script: 
